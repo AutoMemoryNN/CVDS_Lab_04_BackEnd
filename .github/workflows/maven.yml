@@ -47,10 +47,3 @@ jobs:
           cache: maven
       - name: Test with Maven
         run: mvn -B verify --file pom.xml
-
-  deploy:
-    needs: test
-    runs-on: ubuntu-latest
-    steps:
-      - name: Deploy
-        run: echo "En construcción ..."
