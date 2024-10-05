@@ -22,6 +22,7 @@ name: Build and deploy JAR app to Azure Web App
 env:
   AZURE_WEBAPP_NAME: TODO-app
   JAVA_VERSION: '17'
+  DISTRIBUTION: zulu
 
 on:
   push:
