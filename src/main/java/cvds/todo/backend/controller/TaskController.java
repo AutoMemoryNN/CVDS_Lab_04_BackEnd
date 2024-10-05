@@ -117,5 +117,18 @@ public class TaskController {
             return ResponseEntity.status(500).body(e.getMessage());
         }
     }
+
+    /**
+     * Endpoint for verify service state
+     *
+     * @return message
+     */
+    @GetMapping("/health")
+    public ResponseEntity<?> checkHealth() {
+        HashMap<String, String> response = new HashMap<>();
+        response.put("status", "UP");
+        response.put("message", "The server is up");
+        return ResponseEntity.ok(response);
+    }
 }
 
