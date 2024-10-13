@@ -11,7 +11,7 @@ public class TaskModel {
     private String id;
     private String name;
     private String description;
-    private Difficulty difficult;
+    private String difficult;
     private int priority;
     private boolean done;
 
@@ -38,11 +38,11 @@ public class TaskModel {
         this.name = name;
     }
 
-    public Difficulty getDifficult() {
+    public String getDifficult() {
         return difficult;
     }
 
-    public void setDifficult(Difficulty difficult) {
+    public void setDifficult(String difficult) {
         this.difficult = difficult;
     }
 

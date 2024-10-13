@@ -3,9 +3,9 @@ package cvds.todo.backend.services;
 
 import cvds.todo.backend.exceptions.AppException;
 import cvds.todo.backend.exceptions.TaskException;
-
 import cvds.todo.backend.interfeces.TaskRepository;
 import cvds.todo.backend.interfeces.TasksService;
+import cvds.todo.backend.model.Difficulty;
 import cvds.todo.backend.model.TaskModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -60,6 +60,8 @@ public class TaskService implements TasksService {
      */
     @Override
     public TaskModel createTask(TaskModel task) throws AppException {
+        this.isValidTask(task);
+
         String id = UUID.randomUUID().toString();
         task.setId(id);
 
@@ -75,6 +77,8 @@ public class TaskService implements TasksService {
      */
     @Override
     public TaskModel updateTask(String id, TaskModel task) throws AppException {
+        this.isValidTask(task);
+
         Optional<TaskModel> existingTask = taskRepository.findById(id);
 
         if (existingTask.isPresent()) {
@@ -105,5 +109,18 @@ public class TaskService implements TasksService {
             return taskToDelete;
         }
         throw new TaskException.TaskNotFoundException(id);
+    }
+
+    private void isValidTask(TaskModel task) throws AppException {
+        if (task.getName() == null) {
+            throw new TaskException.TaskInvalidValueException("Task name is required");
+        }
+        if (task.getDifficult() != null) {
+            try {
+                Difficulty.valueOf(task.getDifficult().toUpperCase());
+            } catch (IllegalArgumentException e) {
+                throw new TaskException.TaskInvalidValueException("Task difficult is invalid");
+            }
+        }
     }
 }
