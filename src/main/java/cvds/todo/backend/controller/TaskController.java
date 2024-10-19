@@ -109,9 +109,21 @@ public class TaskController {
         try {
             TaskModel deletedTask = taskService.deleteTask(id);
             return ResponseEntity.ok(deletedTask);
+        } catch (Exception e) {
+            if (e instanceof AppException) {
+                return ((AppException) e).getResponse();
+            }
+            return ResponseEntity.status(500).body(e.getMessage());
         }
-        catch (Exception e){
-            if (e instanceof AppException){
+    }
+
+    @PostMapping("/gen")
+    public ResponseEntity<?> generateTasks() {
+        try {
+            List<TaskModel> newTasks = taskService.generateExamples();
+            return ResponseEntity.status(201).body(newTasks.size() + " Tasks were generated");
+        } catch (Exception e) {
+            if (e instanceof AppException) {
                 return ((AppException) e).getResponse();
             }
             return ResponseEntity.status(500).body(e.getMessage());
