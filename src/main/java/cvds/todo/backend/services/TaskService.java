@@ -13,32 +13,17 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 
 
-/**
- * Servicio que implementa la lógica para gestionar las tareas.
- * Se comunica con el repositorio de tareas para realizar operaciones CRUD.
- */
 @Service
 public class TaskService implements TasksService {
 
     @Autowired
     private TaskRepository taskRepository;
 
-    /**
-     * Obtiene todas las tareas desde el repositorio.
-     *
-     * @return Lista de tareas almacenadas en el repositorio.
-     */
     @Override
     public List<TaskModel> getAllTasks() throws AppException {
         return taskRepository.findAll();
     }
 
-    /**
-     * Obtiene una tarea por su ID desde el repositorio.
-     *
-     * @param id Identificador de la tarea.
-     * @return La tarea correspondiente al ID o null si no se encuentra.
-     */
     @Override
     public TaskModel getTaskById(String id) throws AppException {
         Optional<TaskModel> result = taskRepository.findById(id);
@@ -50,12 +35,6 @@ public class TaskService implements TasksService {
         throw new TaskException.TaskNotFoundException(id);
     }
 
-    /**
-     * Crea una nueva tarea y la almacena en el repositorio.
-     *
-     * @param task Modelo de la nueva tarea a crear.
-     * @return La tarea creada.
-     */
     @Override
     public TaskModel createTask(TaskModel task) throws AppException {
         this.isValidTask(task);
@@ -66,13 +45,6 @@ public class TaskService implements TasksService {
         return taskRepository.insert(task);
     }
 
-    /**
-     * Actualiza una tarea existente en el repositorio.
-     *
-     * @param id   Identificador de la tarea a actualizar.
-     * @param task Modelo de la tarea con los nuevos valores.
-     * @return La tarea actualizada.
-     */
     @Override
     public TaskModel updateTask(String id, TaskModel task) throws AppException {
         this.isValidTask(task);
@@ -94,11 +66,6 @@ public class TaskService implements TasksService {
         throw new TaskException.TaskNotFoundException(id);
     }
 
-    /**
-     * Elimina una tarea del repositorio por su ID.
-     *
-     * @param id Identificador de la tarea a eliminar.
-     */
     @Override
     public TaskModel deleteTask(String id) throws AppException {
         if (taskRepository.existsById(id)) {

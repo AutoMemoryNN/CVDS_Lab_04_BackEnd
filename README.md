@@ -1,5 +1,5 @@
 # Laboratorio 4 - BackEnd
-- 
+
 - **Juan Pablo Camargo**
 - **Tomás Panqueva**
 - **Sebastian Buitrago**
@@ -7,6 +7,8 @@
 # API REST para Gestión de Tareas
 
 Este controlador maneja la lógica de la API REST para gestionar tareas utilizando el servicio `TaskService`.
+
+Desplegado en: todo-d2bccdgyhqbchwcb.canadacentral-01.azurewebsites.net/tasks/health
 
 ## Endpoints
 
@@ -45,6 +47,27 @@ Este controlador maneja la lógica de la API REST para gestionar tareas utilizan
 - **Lógica**: Llama a `deleteTask(id)` en el servicio para eliminar una tarea.
 - **Respuesta**: Retorna la tarea eliminada o un mensaje de error si no existe.
 
+### 6. Eliminar todas las tareas
+- **Método**: `DELETE`
+- **URL**: `/tasks/all`
+- **Descripción**: Elimina todas las tareas de la colección.
+- **Lógica**: Llama a `deleteAllTasks()` en el servicio para eliminar todas las tareas.
+- **Respuesta**: Retorna un mensaje indicando cuántas tareas fueron eliminadas exitosamente.
+
+### 7. Generar tareas de ejemplo
+- **Método**: `POST`
+- **URL**: `/tasks/gen`
+- **Descripción**: Genera un conjunto de tareas de ejemplo.
+- **Lógica**: Llama a `generateExamples()` en el servicio para crear tareas de ejemplo.
+- **Respuesta**: Retorna un mensaje indicando cuántas tareas fueron generadas exitosamente.
+
+### 8. Verificar el estado del servicio
+- **Método**: `GET`
+- **URL**: `/tasks/health`
+- **Descripción**: Verifica el estado del servicio.
+- **Lógica**: Devuelve un mensaje que indica que el servidor está operativo.
+- **Respuesta**: Retorna un objeto con el estado del servidor.
+
 ## Servicio `TaskService`
 
 El servicio `TaskService` implementa la lógica de negocio y se encarga de gestionar las operaciones de CRUD comunicándose con el repositorio de tareas.
@@ -54,3 +77,5 @@ El servicio `TaskService` implementa la lógica de negocio y se encarga de gesti
 - **createTask(task)**: Crea una nueva tarea.
 - **updateTask(id, task)**: Actualiza una tarea existente.
 - **deleteTask(id)**: Elimina una tarea por su ID.
+- **deleteAllTasks()**: Elimina todas las tareas.
+- **generateExamples()**: Genera tareas de ejemplo.
