@@ -117,6 +117,11 @@ public class TaskController {
         }
     }
 
+    /**
+     * Eliminar todas las tareas.
+     *
+     * @return Un mensaje indicando cuántas tareas fueron eliminadas exitosamente.
+     */
     @DeleteMapping("/all")
     public ResponseEntity<?> deleteAllTasks() {
         try {
@@ -130,6 +135,11 @@ public class TaskController {
         }
     }
 
+    /**
+     * Generar tareas de ejemplo.
+     *
+     * @return Un mensaje indicando cuántas tareas fueron generadas.
+     */
     @PostMapping("/gen")
     public ResponseEntity<?> generateTasks() {
         try {
