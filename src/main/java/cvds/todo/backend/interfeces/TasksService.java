@@ -18,4 +18,10 @@ public interface TasksService {
     public TaskModel updateTask(String id, TaskModel task) throws AppException;
 
     public TaskModel deleteTask(String id) throws AppException;
+
+    public List<TaskModel> generateExamples() throws AppException;
+
+    List<TaskModel> deleteAllTasks() throws AppException;
+
+    public void isValidTask(TaskModel task) throws AppException;
 }
