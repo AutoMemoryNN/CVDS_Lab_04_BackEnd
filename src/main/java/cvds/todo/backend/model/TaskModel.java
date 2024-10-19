@@ -3,6 +3,7 @@ package cvds.todo.backend.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 @Document(collection = "tasks")
@@ -13,7 +14,11 @@ public class TaskModel {
     private String description;
     private String difficult;
     private int priority;
+    private int durationSeconds;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private boolean done;
+    private boolean isExpired;
 
     public TaskModel() {
     }
@@ -68,6 +73,38 @@ public class TaskModel {
 
     public void setDone(boolean done) {
         this.done = done;
+    }
+
+    public int getDurationSeconds() {
+        return durationSeconds;
+    }
+
+    public void setDurationSeconds(int durationSeconds) {
+        this.durationSeconds = durationSeconds;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public boolean isExpired() {
+        return isExpired;
+    }
+
+    public void setExpired(boolean expired) {
+        isExpired = expired;
     }
 
     @Override
