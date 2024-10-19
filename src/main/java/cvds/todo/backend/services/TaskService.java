@@ -10,9 +10,7 @@ import cvds.todo.backend.model.TaskModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 
 /**
@@ -111,7 +109,26 @@ public class TaskService implements TasksService {
         throw new TaskException.TaskNotFoundException(id);
     }
 
-    private void isValidTask(TaskModel task) throws AppException {
+    @Override
+    public List<TaskModel> generateExamples() throws AppException {
+        Random random = new Random();
+        int numberOfTasks = random.nextInt(901) + 100;
+        List<TaskModel> tasks = new ArrayList<>();
+
+        for (int i = 0; i < numberOfTasks; i++) {
+            TaskModel task = new TaskModel();
+            task.setName("Task: " + (i + 1));
+            task.setDescription("Description for Task " + (i + 1));
+            task.setPriority(random.nextInt(5) + 1);
+            task.setDifficult(String.valueOf(Difficulty.values()[random.nextInt(Difficulty.values().length)]));
+            task.setDone(random.nextBoolean());
+            tasks.add(task);
+            this.createTask(task);
+        }
+        return tasks;
+    }
+
+    public void isValidTask(TaskModel task) throws AppException {
         if (task.getName() == null) {
             throw new TaskException.TaskInvalidValueException("Task name is required");
         }
