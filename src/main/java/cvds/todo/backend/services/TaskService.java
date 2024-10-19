@@ -128,6 +128,14 @@ public class TaskService implements TasksService {
         return tasks;
     }
 
+    public List<TaskModel> deleteAllTasks() throws AppException {
+        List<TaskModel> tasksDeleted = this.getAllTasks();
+        for (TaskModel task : tasksDeleted) {
+            this.deleteTask(task.getId());
+        }
+        return tasksDeleted;
+    }
+
     public void isValidTask(TaskModel task) throws AppException {
         if (task.getName() == null) {
             throw new TaskException.TaskInvalidValueException("Task name is required");

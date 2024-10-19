@@ -21,5 +21,7 @@ public interface TasksService {
 
     public List<TaskModel> generateExamples() throws AppException;
 
+    List<TaskModel> deleteAllTasks() throws AppException;
+
     public void isValidTask(TaskModel task) throws AppException;
 }

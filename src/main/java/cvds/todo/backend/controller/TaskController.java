@@ -117,6 +117,19 @@ public class TaskController {
         }
     }
 
+    @DeleteMapping("/all")
+    public ResponseEntity<?> deleteAllTasks() {
+        try {
+            List<TaskModel> taskDeleted = this.taskService.deleteAllTasks();
+            return ResponseEntity.status(200).body(taskDeleted.size() + " Tasks were deleted successfully");
+        } catch (Exception e) {
+            if (e instanceof AppException) {
+                return ((AppException) e).getResponse();
+            }
+            return ResponseEntity.status(500).body(e.getMessage());
+        }
+    }
+
     @PostMapping("/gen")
     public ResponseEntity<?> generateTasks() {
         try {
