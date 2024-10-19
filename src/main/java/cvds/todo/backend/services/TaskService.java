@@ -125,10 +125,7 @@ public class TaskService implements TasksService {
 
             tasks.add(task);
         }
-        for (TaskModel task : tasks) {
-            this.taskRepository.insert(task);
-        }
-
+        this.taskRepository.insert(tasks);
         return tasks;
     }
 
@@ -146,9 +143,7 @@ public class TaskService implements TasksService {
 
     public List<TaskModel> deleteAllTasks() throws AppException {
         List<TaskModel> tasksDeleted = this.getAllTasks();
-        for (TaskModel task : tasksDeleted) {
-            this.deleteTask(task.getId());
-        }
+        this.taskRepository.deleteAll();
         return tasksDeleted;
     }
 
