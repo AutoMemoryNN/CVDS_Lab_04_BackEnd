@@ -1,15 +1,18 @@
 package cvds.todo.backend.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.Objects;
 
 @Document(collection = "tasks")
 public class TaskModel {
+    @Id
     private String id;
     private String name;
     private String description;
+    private String difficult;
+    private int priority;
     private boolean done;
 
     public TaskModel() {
@@ -35,6 +38,22 @@ public class TaskModel {
         this.name = name;
     }
 
+    public String getDifficult() {
+        return difficult;
+    }
+
+    public void setDifficult(String difficult) {
+        this.difficult = difficult;
+    }
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
     public String getDescription() {
         return description;
     }
@@ -57,7 +76,9 @@ public class TaskModel {
                 "id='" + id + '\'' +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
-                ", done=" + done +
+                ", done='" + done + '\'' +
+                ", priority='" + priority + '\'' +
+                ", difficult='" + difficult + '\'' +
                 '}';
     }
 
@@ -73,6 +94,8 @@ public class TaskModel {
         return done == task.done &&
                 Objects.equals(id, task.id) &&
                 Objects.equals(name, task.name) &&
-                Objects.equals(description, task.description);
+                Objects.equals(description, task.description) &&
+                Objects.equals(priority, task.priority) &&
+                Objects.equals(difficult, task.difficult);
     }
 }
