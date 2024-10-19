@@ -10,7 +10,12 @@ import cvds.todo.backend.model.TaskModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.ZoneOffset;
 import java.util.*;
+import java.util.concurrent.ThreadLocalRandom;
 
 
 @Service
@@ -42,6 +47,10 @@ public class TaskService implements TasksService {
         String id = UUID.randomUUID().toString();
         task.setId(id);
 
+        final LocalDateTime now = LocalDateTime.now();
+        task.setCreatedAt(now);
+        task.setUpdatedAt(now);
+
         return taskRepository.insert(task);
     }
 
@@ -56,8 +65,16 @@ public class TaskService implements TasksService {
 
             taskToUpdate.setName(task.getName() == null ? taskToUpdate.getName() : task.getName());
             taskToUpdate.setDescription(task.getDescription() == null ? taskToUpdate.getDescription() : task.getDescription());
+            taskToUpdate.setDeadline(task.getDeadline() == null ? taskToUpdate.getDeadline() : task.getDeadline());
+            taskToUpdate.setPriority(task.getPriority() == 0 ? taskToUpdate.getPriority() : task.getPriority());
+            taskToUpdate.setDifficult(task.getDifficult() == null ? taskToUpdate.getDifficult() : task.getDifficult());
             taskToUpdate.setDone(task.isDone());
 
+            taskToUpdate.setUpdatedAt(LocalDateTime.now());
+
+            if (taskToUpdate.getDeadline() != null) {
+                taskToUpdate.setExpired(this.isExpired(taskToUpdate));
+            }
             this.taskRepository.save(taskToUpdate);
 
             return taskToUpdate;
@@ -87,15 +104,44 @@ public class TaskService implements TasksService {
 
         for (int i = 0; i < numberOfTasks; i++) {
             TaskModel task = new TaskModel();
+
+            task.setId(UUID.randomUUID().toString());
+
             task.setName("Task: " + (i + 1));
             task.setDescription("Description for Task " + (i + 1));
             task.setPriority(random.nextInt(5) + 1);
             task.setDifficult(String.valueOf(Difficulty.values()[random.nextInt(Difficulty.values().length)]));
             task.setDone(random.nextBoolean());
+
+            task.setDeadline(this.getRandomDateTime(LocalDate.now().plusDays(-5), LocalTime.now(), 25));
+
+            final LocalDateTime randomDateTime = this.getRandomDateTime(LocalDate.now(), LocalTime.now(), 30);
+            task.setCreatedAt(randomDateTime);
+            task.setUpdatedAt(randomDateTime);
+
+            task.setExpired(this.isExpired(task));
+
+            this.isValidTask(task);
+
             tasks.add(task);
-            this.createTask(task);
         }
+        for (TaskModel task : tasks) {
+            this.taskRepository.insert(task);
+        }
+
         return tasks;
+    }
+
+    public LocalDateTime getRandomDateTime(final LocalDate startDate, final LocalTime startTime, final int daysOfRange) {
+        long minDay = LocalDateTime.of(startDate, startTime).toEpochSecond(ZoneOffset.UTC);
+        long maxDay = LocalDateTime.of(LocalDate.now().plusDays(daysOfRange), startTime).toEpochSecond(ZoneOffset.UTC);
+
+        long randomDay = ThreadLocalRandom.current().nextLong(minDay, maxDay);
+        return LocalDateTime.ofEpochSecond(randomDay, 0, ZoneOffset.UTC);
+    }
+
+    public boolean isExpired(TaskModel task) {
+        return task.getDeadline().isBefore(LocalDateTime.now());
     }
 
     public List<TaskModel> deleteAllTasks() throws AppException {
@@ -110,12 +156,18 @@ public class TaskService implements TasksService {
         if (task.getName() == null) {
             throw new TaskException.TaskInvalidValueException("Task name is required");
         }
+        if (task.getPriority() < 0 || 5 < task.getPriority()) {
+            throw new TaskException.TaskInvalidValueException("Task priority invalid value, out of range [0, 1, 2, 3, 4, 5]");
+        }
         if (task.getDifficult() != null) {
             try {
                 Difficulty.valueOf(task.getDifficult().toUpperCase());
             } catch (IllegalArgumentException e) {
                 throw new TaskException.TaskInvalidValueException("Task difficult is invalid");
             }
+        }
+        if (task.getUpdatedAt() != null && task.getCreatedAt() != null && task.getUpdatedAt().isBefore(task.getCreatedAt())) {
+            throw new TaskException.TaskInvalidValueException("Task updated at is before created at!");
         }
     }
 }

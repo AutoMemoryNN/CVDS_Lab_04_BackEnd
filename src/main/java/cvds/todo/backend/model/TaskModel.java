@@ -14,7 +14,7 @@ public class TaskModel {
     private String description;
     private String difficult;
     private int priority;
-    private int durationSeconds;
+    private LocalDateTime deadline;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private boolean done;
@@ -75,12 +75,12 @@ public class TaskModel {
         this.done = done;
     }
 
-    public int getDurationSeconds() {
-        return durationSeconds;
+    public LocalDateTime getDeadline() {
+        return deadline;
     }
 
-    public void setDurationSeconds(int durationSeconds) {
-        this.durationSeconds = durationSeconds;
+    public void setDeadline(LocalDateTime deadline) {
+        this.deadline = deadline;
     }
 
     public LocalDateTime getUpdatedAt() {
