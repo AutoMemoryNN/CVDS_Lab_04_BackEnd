@@ -255,4 +255,74 @@ class TaskControllerTest {
         verify(taskService).deleteTask(nonExistentId);
     }
 
+    /**
+     * Tests creation of a task with a missing name field.
+     * Verifies that the response returns a bad request status
+     * when the task name is not provided in the request body.
+     *
+     * @throws Exception if an error occurs during test execution.
+     */
+    @Test
+    void createTask_WhenMissingName_ShouldReturnBadRequest() throws Exception {
+        TaskModel invalidTask = new TaskModel();
+        invalidTask.setDescription("Missing name field");
+
+        mockMvc.perform(post("/tasks")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(invalidTask.toString()))
+                .andExpect(status().isBadRequest());
+
+        verify(taskService, never()).createTask(any(TaskModel.class));
+    }
+
+    /**
+     * Tests creation of a task with a missing name field.
+     * Verifies that the response returns a bad request status
+     * when the task name is not provided in the request body.
+     *
+     * @throws Exception if an error occurs during test execution.
+     */
+    @Test
+    void deleteAllTasks_ShouldDeleteAllAndReturnCount() throws Exception {
+        when(taskService.deleteAllTasks()).thenReturn(Collections.singletonList(task));
+
+        mockMvc.perform(delete("/tasks/all"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("1 Tasks were deleted successfully"));
+
+        verify(taskService).deleteAllTasks();
+    }
+
+    /**
+     * Tests generation of example tasks.
+     * Mocks the task service to generate tasks and verifies
+     * that the HTTP response returns the correct task count.
+     *
+     * @throws Exception if an error occurs during test execution.
+     */
+    @Test
+    void generateTasks_ShouldGenerateTasks() throws Exception {
+        when(taskService.generateExamples()).thenReturn(Collections.singletonList(task));
+
+        mockMvc.perform(post("/tasks/gen"))
+                .andExpect(status().isCreated())
+                .andExpect(content().string("1 Tasks were generated"));
+
+        verify(taskService).generateExamples();
+    }
+
+    /**
+     * Tests the health check endpoint of the TaskController.
+     * Verifies that the HTTP response indicates the service is up.
+     *
+     * @throws Exception if an error occurs during test execution.
+     */
+    @Test
+    void checkHealth_ShouldReturnServiceUp() throws Exception {
+        mockMvc.perform(get("/tasks/health"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("UP"))
+                .andExpect(jsonPath("$.message").value("The server is up"));
+    }
+
 }
