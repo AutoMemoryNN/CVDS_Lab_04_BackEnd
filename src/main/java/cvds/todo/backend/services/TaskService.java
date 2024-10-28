@@ -51,6 +51,10 @@ public class TaskService implements TasksService {
         task.setUpdatedAt(LocalDateTime.now());
         task.setOwnerIds(Collections.singletonList(user.getId()));
 
+        final LocalDateTime now = LocalDateTime.now();
+        task.setCreatedAt(now);
+        task.setUpdatedAt(now);
+
         return taskRepository.insert(task);
     }
 
@@ -71,6 +75,7 @@ public class TaskService implements TasksService {
 
             taskToUpdate.setUpdatedAt(LocalDateTime.now());
             this.isValidTask(taskToUpdate);
+
             this.taskRepository.save(taskToUpdate);
 
             return taskToUpdate;
@@ -133,6 +138,7 @@ public class TaskService implements TasksService {
     public List<TaskModel> deleteAllTasks(UserModel user) throws AppException {
         List<TaskModel> tasksDeleted = getAllTasks(user);
         tasksDeleted.forEach(task -> taskRepository.deleteByIdAndOwnerIdsContaining(user.getId(), task.getId()));
+
         return tasksDeleted;
     }
 
@@ -143,7 +149,9 @@ public class TaskService implements TasksService {
         if (task.getPriority() < 0 || 5 < task.getPriority()) {
             throw new TaskException.TaskInvalidValueException("Task priority invalid value, out of range [0, 1, 2, 3, 4, 5]");
         }
+
         if (task.getDifficulty() != null) {
+
             try {
                 Difficulty.valueOf(task.getDifficulty().toUpperCase());
             } catch (IllegalArgumentException e) {

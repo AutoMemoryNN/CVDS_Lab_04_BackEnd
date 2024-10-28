@@ -4,7 +4,9 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
+
 import java.util.List;
+
 import java.util.Objects;
 
 @Document(collection = "tasks")
@@ -19,7 +21,9 @@ public class TaskModel {
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
     private boolean done;
+
     private List<String> ownerIds;
+
 
     public TaskModel() {
     }
@@ -114,6 +118,7 @@ public class TaskModel {
 
     public void removeOwnerId(String ownerId) {
         this.ownerIds.remove(ownerId);
+
     }
 
     @Override
