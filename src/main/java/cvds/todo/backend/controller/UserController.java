@@ -1,5 +1,6 @@
 package cvds.todo.backend.controller;
 
+import cvds.todo.backend.exceptions.UserException;
 import cvds.todo.backend.model.LoginModel;
 import cvds.todo.backend.model.UserModel;
 import cvds.todo.backend.services.SessionService;
@@ -8,9 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
+import java.util.Collections;
 import java.util.Set;
 
 @RestController
@@ -27,9 +26,12 @@ public class UserController {
     public ResponseEntity<?> createUserAsUser(@RequestBody UserModel user) {
         try {
             final UserModel modelUser = userService.createUserAsUser(user);
-            return ResponseEntity.status(201).body("The user " + modelUser.getUsername() + " was created successfully.");
+            return ResponseEntity.status(201).body(Collections.singletonMap("message", "The user " + modelUser.getUsername() + " was created successfully."));
         } catch (Exception e) {
-            return ResponseEntity.status(499).body(e.getMessage());
+            if (e instanceof UserException) {
+                return ((UserException) e).getResponse();
+            }
+            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Server error"));
         }
     }
 
@@ -37,9 +39,12 @@ public class UserController {
     public ResponseEntity<?> createUserAsAdmin(@RequestBody UserModel user, @RequestBody Set<String> roles) {
         try {
             final UserModel modelUser = userService.createUserAsAdmin(user, roles);
-            return ResponseEntity.status(201).body("The user " + modelUser.getUsername() + " was created successfully.");
+            return ResponseEntity.status(201).body(Collections.singletonMap("message", "The user " + modelUser.getUsername() + " was created successfully."));
         } catch (Exception e) {
-            return ResponseEntity.status(499).body(e.getMessage());
+            if (e instanceof UserException) {
+                return ((UserException) e).getResponse();
+            }
+            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Server error"));
         }
     }
 
@@ -47,65 +52,63 @@ public class UserController {
     public ResponseEntity<?> loginUser(@RequestBody LoginModel login) {
         try {
             UserModel user = userService.loginUser(login.getUsername(), login.getPassword());
-            if (user == null) {
-                return ResponseEntity.status(401).body("Invalid username or password.");
-            }
-
-            HashMap<String, String> response = new HashMap<>(1);
-
-            response.put("cookie", this.sessionService.createSessionCookie(user));
-
-            return ResponseEntity.ok().body(response);
+            return ResponseEntity.ok().body(Collections.singletonMap("cookie", this.sessionService.createSessionCookie(user)));
         } catch (Exception e) {
-            return ResponseEntity.status(499).body(e.getMessage());
+            if (e instanceof UserException) {
+                return ((UserException) e).getResponse();
+            }
+            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Server error"));
         }
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getUserById(@PathVariable String id) {
         try {
-            UserModel user = userService.getUserById(id);
-            if (user != null) {
-                return ResponseEntity.ok(user);
-            }
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.ok(userService.getUserById(id));
+
         } catch (Exception e) {
-            return ResponseEntity.status(499).body(e.getMessage());
+            if (e instanceof UserException) {
+                return ((UserException) e).getResponse();
+            }
+            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Server error"));
         }
     }
 
     @GetMapping
     public ResponseEntity<?> getAllUsers() {
         try {
-            List<UserModel> users = userService.getAllUsers();
-            return ResponseEntity.ok(users);
+            return ResponseEntity.ok(userService.getAllUsers());
         } catch (Exception e) {
-            return ResponseEntity.status(499).body(e.getMessage());
+            if (e instanceof UserException) {
+                return ((UserException) e).getResponse();
+            }
+            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Server error"));
         }
     }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> updateUser(@PathVariable String id, @RequestBody UserModel user) {
         try {
-            UserModel updatedUser = userService.updateUser(id, user);
-            if (updatedUser != null) {
-                return ResponseEntity.ok(updatedUser);
-            }
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.ok(userService.updateUser(id, user));
         } catch (Exception e) {
-            return ResponseEntity.status(499).body(e.getMessage());
+            if (e instanceof UserException) {
+                return ((UserException) e).getResponse();
+            }
+            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Server error"));
         }
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteUser(@PathVariable String id) {
         try {
-            if (userService.deleteUser(id) != null) {
-                return ResponseEntity.ok("User deleted successfully");
-            }
-            return ResponseEntity.notFound().build();
+            userService.deleteUser(id);
+            return ResponseEntity.ok(Collections.singletonMap("message", "User deleted successfully"));
+
         } catch (Exception e) {
-            return ResponseEntity.status(499).body(e.getMessage());
+            if (e instanceof UserException) {
+                return ((UserException) e).getResponse();
+            }
+            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Server error"));
         }
     }
 }
