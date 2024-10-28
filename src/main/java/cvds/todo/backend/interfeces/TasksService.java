@@ -2,6 +2,7 @@ package cvds.todo.backend.interfeces;
 
 import cvds.todo.backend.exceptions.AppException;
 import cvds.todo.backend.model.TaskModel;
+import cvds.todo.backend.model.UserModel;
 
 import java.util.List;
 
@@ -17,7 +18,7 @@ public interface TasksService {
      * @return List of all available tasks.
      * @throws AppException if an error occurs while retrieving the tasks.
      */
-    List<TaskModel> getAllTasks() throws AppException;
+    List<TaskModel> getAllTasks(UserModel user) throws AppException;
 
     /**
      * Get a task by its ID.
@@ -26,7 +27,7 @@ public interface TasksService {
      * @return The task corresponding to the provided ID.
      * @throws AppException if an error occurs while retrieving the task.
      */
-    TaskModel getTaskById(String id) throws AppException;
+    TaskModel getTaskById(String id, UserModel user) throws AppException;
 
     /**
      * Create a new task.
@@ -35,7 +36,7 @@ public interface TasksService {
      * @return The created task.
      * @throws AppException if an error occurs while creating the task.
      */
-    TaskModel createTask(TaskModel task) throws AppException;
+    TaskModel createTask(TaskModel task, UserModel user) throws AppException;
 
     /**
      * Update an existing task by its ID.
@@ -45,7 +46,7 @@ public interface TasksService {
      * @return The updated task.
      * @throws AppException if an error occurs while updating the task.
      */
-    TaskModel updateTask(String id, TaskModel task) throws AppException;
+    TaskModel updateTask(String id, TaskModel task, UserModel user) throws AppException;
 
     /**
      * Delete a task by its ID.
@@ -54,7 +55,7 @@ public interface TasksService {
      * @return The deleted task.
      * @throws AppException if an error occurs while deleting the task.
      */
-    TaskModel deleteTask(String id) throws AppException;
+    TaskModel deleteTask(String id, UserModel user) throws AppException;
 
     /**
      * Generate examples of tasks.
@@ -62,7 +63,7 @@ public interface TasksService {
      * @return List of generated example tasks.
      * @throws AppException if an error occurs while generating the tasks.
      */
-    List<TaskModel> generateExamples() throws AppException;
+    List<TaskModel> generateExamples(UserModel user) throws AppException;
 
     /**
      * Delete all tasks.
@@ -70,7 +71,7 @@ public interface TasksService {
      * @return List of all deleted tasks.
      * @throws AppException if an error occurs while deleting the tasks.
      */
-    List<TaskModel> deleteAllTasks() throws AppException;
+    List<TaskModel> deleteAllTasks(UserModel user) throws AppException;
 
     /**
      * Validate a task before insert in database.

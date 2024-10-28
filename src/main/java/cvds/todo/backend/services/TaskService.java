@@ -3,7 +3,8 @@ package cvds.todo.backend.services;
 
 import cvds.todo.backend.exceptions.AppException;
 import cvds.todo.backend.exceptions.TaskException;
-import cvds.todo.backend.interfeces.TaskRepository;
+import cvds.todo.backend.model.UserModel;
+import cvds.todo.backend.repository.TaskRepository;
 import cvds.todo.backend.interfeces.TasksService;
 import cvds.todo.backend.model.Difficulty;
 import cvds.todo.backend.model.TaskModel;
@@ -17,6 +18,7 @@ import java.time.ZoneOffset;
 import java.util.*;
 import java.util.concurrent.ThreadLocalRandom;
 
+//TODO : renew cookie
 
 @Service
 public class TaskService implements TasksService {
@@ -25,27 +27,29 @@ public class TaskService implements TasksService {
     private TaskRepository taskRepository;
 
     @Override
-    public List<TaskModel> getAllTasks() throws AppException {
-        return taskRepository.findAll();
+    public List<TaskModel> getAllTasks(UserModel user) throws AppException {
+        return taskRepository.findByOwnerIdsContaining(user.getId());
     }
 
     @Override
-    public TaskModel getTaskById(String id) throws AppException {
-        Optional<TaskModel> result = taskRepository.findById(id);
+    public TaskModel getTaskById(String id, UserModel user) throws AppException {
+        TaskModel result = taskRepository.findFirstByOwnerIdsContainingAndId(user.getId(), id);
 
-        if (result.isPresent()) {
-            return result.get();
+        if (result != null) {
+            return result;
         }
 
         throw new TaskException.TaskNotFoundException(id);
     }
 
     @Override
-    public TaskModel createTask(TaskModel task) throws AppException {
-        this.isValidTask(task);
+    public TaskModel createTask(TaskModel task, UserModel user) throws AppException {
+        isValidTask(task);
 
-        String id = UUID.randomUUID().toString();
-        task.setId(id);
+        task.setId(UUID.randomUUID().toString());
+        task.setCreatedAt(LocalDateTime.now());
+        task.setUpdatedAt(LocalDateTime.now());
+        task.setOwnerIds(Collections.singletonList(user.getId()));
 
         final LocalDateTime now = LocalDateTime.now();
         task.setCreatedAt(now);
@@ -55,8 +59,7 @@ public class TaskService implements TasksService {
     }
 
     @Override
-    public TaskModel updateTask(String id, TaskModel task) throws AppException {
-        this.isValidTask(task);
+    public TaskModel updateTask(String id, TaskModel task, UserModel user) throws AppException {
 
         Optional<TaskModel> existingTask = taskRepository.findById(id);
 
@@ -67,14 +70,12 @@ public class TaskService implements TasksService {
             taskToUpdate.setDescription(task.getDescription() == null ? taskToUpdate.getDescription() : task.getDescription());
             taskToUpdate.setDeadline(task.getDeadline() == null ? taskToUpdate.getDeadline() : task.getDeadline());
             taskToUpdate.setPriority(task.getPriority() == 0 ? taskToUpdate.getPriority() : task.getPriority());
-            taskToUpdate.setDifficult(task.getDifficult() == null ? taskToUpdate.getDifficult() : task.getDifficult());
+            taskToUpdate.setDifficulty(task.getDifficulty() == null ? taskToUpdate.getDifficulty() : task.getDifficulty());
             taskToUpdate.setDone(task.isDone());
 
             taskToUpdate.setUpdatedAt(LocalDateTime.now());
+            this.isValidTask(taskToUpdate);
 
-            if (taskToUpdate.getDeadline() != null) {
-                taskToUpdate.setExpired(this.isExpired(taskToUpdate));
-            }
             this.taskRepository.save(taskToUpdate);
 
             return taskToUpdate;
@@ -84,12 +85,11 @@ public class TaskService implements TasksService {
     }
 
     @Override
-    public TaskModel deleteTask(String id) throws AppException {
-        Optional<TaskModel> optionalTask = taskRepository.findById(id);
+    public TaskModel deleteTask(String id, UserModel user) throws AppException {
+        TaskModel taskToDelete = taskRepository.findFirstByOwnerIdsContainingAndId(user.getId(), id);
 
-        if (optionalTask.isPresent()) {
-            TaskModel taskToDelete = optionalTask.get();
-            taskRepository.deleteById(id);
+        if (taskToDelete != null) {
+            taskRepository.delete(taskToDelete);
             return taskToDelete;
         }
 
@@ -97,7 +97,7 @@ public class TaskService implements TasksService {
     }
 
     @Override
-    public List<TaskModel> generateExamples() throws AppException {
+    public List<TaskModel> generateExamples(UserModel user) throws AppException {
         Random random = new Random();
         int numberOfTasks = random.nextInt(901) + 100;
         List<TaskModel> tasks = new ArrayList<>();
@@ -110,7 +110,7 @@ public class TaskService implements TasksService {
             task.setName("Task: " + (i + 1));
             task.setDescription("Description for Task " + (i + 1));
             task.setPriority(random.nextInt(5) + 1);
-            task.setDifficult(String.valueOf(Difficulty.values()[random.nextInt(Difficulty.values().length)]));
+            task.setDifficulty(String.valueOf(Difficulty.values()[random.nextInt(Difficulty.values().length)]));
             task.setDone(random.nextBoolean());
 
             task.setDeadline(this.getRandomDateTime(LocalDate.now().plusDays(-5), LocalTime.now(), 25));
@@ -118,8 +118,6 @@ public class TaskService implements TasksService {
             final LocalDateTime randomDateTime = this.getRandomDateTime(LocalDate.now(), LocalTime.now(), 30);
             task.setCreatedAt(randomDateTime);
             task.setUpdatedAt(randomDateTime);
-
-            task.setExpired(this.isExpired(task));
 
             this.isValidTask(task);
 
@@ -137,13 +135,10 @@ public class TaskService implements TasksService {
         return LocalDateTime.ofEpochSecond(randomDay, 0, ZoneOffset.UTC);
     }
 
-    public boolean isExpired(TaskModel task) {
-        return task.getDeadline().isBefore(LocalDateTime.now());
-    }
+    public List<TaskModel> deleteAllTasks(UserModel user) throws AppException {
+        List<TaskModel> tasksDeleted = getAllTasks(user);
+        tasksDeleted.forEach(task -> taskRepository.deleteByIdAndOwnerIdsContaining(user.getId(), task.getId()));
 
-    public List<TaskModel> deleteAllTasks() throws AppException {
-        List<TaskModel> tasksDeleted = this.getAllTasks();
-        this.taskRepository.deleteAll();
         return tasksDeleted;
     }
 
@@ -154,11 +149,13 @@ public class TaskService implements TasksService {
         if (task.getPriority() < 0 || 5 < task.getPriority()) {
             throw new TaskException.TaskInvalidValueException("Task priority invalid value, out of range [0, 1, 2, 3, 4, 5]");
         }
-        if (task.getDifficult() != null) {
+
+        if (task.getDifficulty() != null) {
+
             try {
-                Difficulty.valueOf(task.getDifficult().toUpperCase());
+                Difficulty.valueOf(task.getDifficulty().toUpperCase());
             } catch (IllegalArgumentException e) {
-                throw new TaskException.TaskInvalidValueException("Task difficult is invalid");
+                throw new TaskException.TaskInvalidValueException("Task difficulty is invalid");
             }
         }
         if (task.getUpdatedAt() != null && task.getCreatedAt() != null && task.getUpdatedAt().isBefore(task.getCreatedAt())) {
