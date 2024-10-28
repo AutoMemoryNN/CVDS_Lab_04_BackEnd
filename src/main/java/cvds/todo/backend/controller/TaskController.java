@@ -2,7 +2,10 @@ package cvds.todo.backend.controller;
 
 import cvds.todo.backend.exceptions.AppException;
 import cvds.todo.backend.model.TaskModel;
+import cvds.todo.backend.model.UserModel;
+import cvds.todo.backend.services.SessionService;
 import cvds.todo.backend.services.TaskService;
+import cvds.todo.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,15 +24,23 @@ public class TaskController {
     @Autowired
     private TaskService taskService;
 
+    @Autowired
+    private SessionService sessionService;
+
     /**
      * Obtener todas las tareas.
      *
      * @return Lista de todas las tareas.
      */
     @GetMapping
-    public ResponseEntity<?> getAllTasks() {
+    public ResponseEntity<?> getAllTasks(@RequestHeader("Authorization") String sessionToken) {
+        UserModel userLogged = this.getUserFromSessions(sessionToken);
+        if (userLogged == null) {
+            return ResponseEntity.status(401).body("No session found");
+        }
         try {
-            List<TaskModel> tasks = taskService.getAllTasks();
+            List<TaskModel> tasks = taskService.getAllTasks(userLogged);
+            tasks.forEach(elem -> elem.setOwnerIds(null));
             return ResponseEntity.ok(tasks);
         } catch (Exception e) {
             if (e instanceof AppException) {
@@ -47,9 +58,13 @@ public class TaskController {
      * @return La tarea correspondiente al ID proporcionado.
      */
     @GetMapping("/{id}")
-    public ResponseEntity<?> getTaskById(@PathVariable("id") String id) {
+    public ResponseEntity<?> getTaskById(@RequestHeader("Authorization") String sessionToken, @PathVariable("id") String id) {
+        UserModel userLogged = this.getUserFromSessions(sessionToken);
+        if (userLogged == null) {
+            return ResponseEntity.status(401).body("No session found");
+        }
         try {
-            TaskModel task = taskService.getTaskById(id);
+            TaskModel task = taskService.getTaskById(id, userLogged);
             return ResponseEntity.ok(task);
         } catch (Exception e) {
             if (e instanceof AppException) {
@@ -66,10 +81,15 @@ public class TaskController {
      * @return El UUID de la nueva tarea creada.
      */
     @PostMapping
-    public ResponseEntity<?> createTask(@RequestBody TaskModel task) {
+    public ResponseEntity<?> createTask(@RequestHeader("Authorization") String sessionToken, @RequestBody TaskModel task) {
+        UserModel userLogged = this.getUserFromSessions(sessionToken);
+        if (userLogged == null) {
+            return ResponseEntity.status(401).body("No session found");
+        }
         try {
-            taskService.createTask(task);
-            return ResponseEntity.status(201).body(task);
+            TaskModel taskModel = taskService.createTask(task, userLogged);
+            taskModel.setOwnerIds(null);
+            return ResponseEntity.status(201).body(taskModel);
         } catch (Exception e) {
             if (e instanceof AppException) {
                 return ((AppException) e).getResponse();
@@ -86,9 +106,14 @@ public class TaskController {
      * @return La tarea actualizada.
      */
     @PatchMapping("/{id}")
-    public ResponseEntity<?> updateTask(@PathVariable("id") String id, @RequestBody TaskModel task) {
+    public ResponseEntity<?> updateTask(@RequestHeader("Authorization") String sessionToken, @PathVariable("id") String id, @RequestBody TaskModel task) {
+        UserModel userLogged = this.getUserFromSessions(sessionToken);
+        if (userLogged == null) {
+            return ResponseEntity.status(401).body("No session found");
+        }
         try {
-            TaskModel updatedTask = taskService.updateTask(id, task);
+            TaskModel updatedTask = taskService.updateTask(id, task, userLogged);
+            updatedTask.setOwnerIds(null);
             return ResponseEntity.status(200).body(updatedTask);
         } catch (Exception e) {
             if (e instanceof AppException) {
@@ -105,9 +130,14 @@ public class TaskController {
      * @return Respuesta sin contenido.
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteTask(@PathVariable("id") String id) {
+    public ResponseEntity<?> deleteTask(@RequestHeader("Authorization") String sessionToken, @PathVariable("id") String id) {
+        UserModel userLogged = this.getUserFromSessions(sessionToken);
+        if (userLogged == null) {
+            return ResponseEntity.status(401).body("No session found");
+        }
         try {
-            TaskModel deletedTask = taskService.deleteTask(id);
+            TaskModel deletedTask = taskService.deleteTask(id, userLogged);
+            deletedTask.setOwnerIds(null);
             return ResponseEntity.ok(deletedTask);
         } catch (Exception e) {
             if (e instanceof AppException) {
@@ -123,9 +153,13 @@ public class TaskController {
      * @return Un mensaje indicando cuántas tareas fueron eliminadas exitosamente.
      */
     @DeleteMapping("/all")
-    public ResponseEntity<?> deleteAllTasks() {
+    public ResponseEntity<?> deleteAllTasks(@RequestHeader("Authorization") String sessionToken) {
+        UserModel userLogged = this.getUserFromSessions(sessionToken);
+        if (userLogged == null) {
+            return ResponseEntity.status(401).body("No session found");
+        }
         try {
-            List<TaskModel> taskDeleted = this.taskService.deleteAllTasks();
+            List<TaskModel> taskDeleted = this.taskService.deleteAllTasks(userLogged);
             return ResponseEntity.status(200).body(taskDeleted.size() + " Tasks were deleted successfully");
         } catch (Exception e) {
             if (e instanceof AppException) {
@@ -141,9 +175,13 @@ public class TaskController {
      * @return Un mensaje indicando cuántas tareas fueron generadas.
      */
     @PostMapping("/gen")
-    public ResponseEntity<?> generateTasks() {
+    public ResponseEntity<?> generateTasks(@RequestHeader("Authorization") String sessionToken) {
+        UserModel userLogged = this.getUserFromSessions(sessionToken);
+        if (userLogged == null) {
+            return ResponseEntity.status(401).body("No session found");
+        }
         try {
-            List<TaskModel> newTasks = taskService.generateExamples();
+            List<TaskModel> newTasks = taskService.generateExamples(userLogged);
             return ResponseEntity.status(201).body(newTasks.size() + " Tasks were generated");
         } catch (Exception e) {
             if (e instanceof AppException) {
@@ -164,6 +202,13 @@ public class TaskController {
         response.put("status", "UP");
         response.put("message", "The server is up");
         return ResponseEntity.ok(response);
+    }
+
+    private UserModel getUserFromSessions(String sessionToken) {
+        if (sessionToken == null || !this.sessionService.isSessionActive(sessionToken)) {
+            return null;
+        }
+        return this.sessionService.getUserFromSession(sessionToken);
     }
 }
 

@@ -1,6 +1,8 @@
 package cvds.todo.backend;
 
+
 import cvds.todo.backend.services.TaskService;
+import cvds.todo.backend.services.UserService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -31,4 +33,7 @@ public class Config implements WebMvcConfigurer {
     public TaskService taskService() {
         return new TaskService();
     }
+
+    @Bean
+    public UserService userService() {return new UserService();}
 }

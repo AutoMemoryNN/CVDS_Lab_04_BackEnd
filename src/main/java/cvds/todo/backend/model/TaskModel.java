@@ -3,6 +3,8 @@ package cvds.todo.backend.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Objects;
 
 @Document(collection = "tasks")
@@ -11,9 +13,13 @@ public class TaskModel {
     private String id;
     private String name;
     private String description;
-    private String difficult;
+    private String difficulty;
     private int priority;
+    private LocalDateTime deadline;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
     private boolean done;
+    private List<String> ownerIds;
 
     public TaskModel() {
     }
@@ -38,12 +44,12 @@ public class TaskModel {
         this.name = name;
     }
 
-    public String getDifficult() {
-        return difficult;
+    public String getDifficulty() {
+        return difficulty;
     }
 
-    public void setDifficult(String difficult) {
-        this.difficult = difficult;
+    public void setDifficulty(String difficulty) {
+        this.difficulty = difficulty;
     }
 
     public int getPriority() {
@@ -70,6 +76,46 @@ public class TaskModel {
         this.done = done;
     }
 
+    public LocalDateTime getDeadline() {
+        return deadline;
+    }
+
+    public void setDeadline(LocalDateTime deadline) {
+        this.deadline = deadline;
+    }
+
+    public LocalDateTime getUpdatedAt() {
+        return updatedAt;
+    }
+
+    public void setUpdatedAt(LocalDateTime updatedAt) {
+        this.updatedAt = updatedAt;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
+
+    public List<String> getOwnerIds() {
+        return ownerIds;
+    }
+
+    public void setOwnerIds(List<String> ownerIds) {
+        this.ownerIds = ownerIds;
+    }
+
+    public void addOwnerId(String ownerId) {
+        this.ownerIds.add(ownerId);
+    }
+
+    public void removeOwnerId(String ownerId) {
+        this.ownerIds.remove(ownerId);
+    }
+
     @Override
     public String toString() {
         return "TaskModel{" +
@@ -78,7 +124,7 @@ public class TaskModel {
                 ", description='" + description + '\'' +
                 ", done='" + done + '\'' +
                 ", priority='" + priority + '\'' +
-                ", difficult='" + difficult + '\'' +
+                ", difficult='" + difficulty + '\'' +
                 '}';
     }
 
@@ -96,6 +142,6 @@ public class TaskModel {
                 Objects.equals(name, task.name) &&
                 Objects.equals(description, task.description) &&
                 Objects.equals(priority, task.priority) &&
-                Objects.equals(difficult, task.difficult);
+                Objects.equals(difficulty, task.difficulty);
     }
 }
