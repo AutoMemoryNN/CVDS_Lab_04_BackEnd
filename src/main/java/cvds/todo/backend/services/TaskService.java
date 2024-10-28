@@ -6,7 +6,7 @@ import cvds.todo.backend.exceptions.TaskException;
 import cvds.todo.backend.model.UserModel;
 import cvds.todo.backend.repository.TaskRepository;
 import cvds.todo.backend.interfeces.TasksService;
-import cvds.todo.backend.model.Difficulty;
+import cvds.todo.backend.enums.Difficulty;
 import cvds.todo.backend.model.TaskModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
