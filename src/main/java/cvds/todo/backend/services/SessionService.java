@@ -1,5 +1,6 @@
 package cvds.todo.backend.services;
 
+import cvds.todo.backend.interfeces.SessionsService;
 import cvds.todo.backend.model.UserModel;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Service;
@@ -10,7 +11,7 @@ import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-public class SessionService {
+public class SessionService implements SessionsService {
     private final Map<String, SessionInfo> activeSessions = new ConcurrentHashMap<>();
     private static final int COOKIE_MAX_AGE = 1800;
 
@@ -53,6 +54,17 @@ public class SessionService {
 //                .path("/")
 //                .httpOnly(true)
 //                .build();
+    }
+
+    public boolean renewSession(String sessionId) {
+        SessionInfo sessionInfo = activeSessions.get(sessionId);
+
+        if (sessionInfo == null || System.currentTimeMillis() > sessionInfo.expirationTime) {
+            return false;
+        }
+
+        sessionInfo.expirationTime = System.currentTimeMillis() + (COOKIE_MAX_AGE * 1000);
+        return true;
     }
 
     public boolean isSessionActive(String sessionId) {

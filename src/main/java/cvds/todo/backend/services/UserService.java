@@ -2,7 +2,7 @@ package cvds.todo.backend.services;
 
 import cvds.todo.backend.exceptions.UserException;
 import cvds.todo.backend.interfeces.UsersService;
-import cvds.todo.backend.model.Role;
+import cvds.todo.backend.enums.Role;
 import cvds.todo.backend.model.UserModel;
 import cvds.todo.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;

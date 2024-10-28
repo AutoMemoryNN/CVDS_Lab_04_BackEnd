@@ -19,9 +19,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private SessionService sessionService;
-
     @PostMapping
     public ResponseEntity<?> createUserAsUser(@RequestBody UserModel user) {
         try {
@@ -40,19 +37,6 @@ public class UserController {
         try {
             final UserModel modelUser = userService.createUserAsAdmin(user, roles);
             return ResponseEntity.status(201).body(Collections.singletonMap("message", "The user " + modelUser.getUsername() + " was created successfully."));
-        } catch (Exception e) {
-            if (e instanceof UserException) {
-                return ((UserException) e).getResponse();
-            }
-            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Server error"));
-        }
-    }
-
-    @PostMapping("/auth")
-    public ResponseEntity<?> loginUser(@RequestBody LoginModel login) {
-        try {
-            UserModel user = userService.loginUser(login.getUsername(), login.getPassword());
-            return ResponseEntity.ok().body(Collections.singletonMap("cookie", this.sessionService.createSessionCookie(user)));
         } catch (Exception e) {
             if (e instanceof UserException) {
                 return ((UserException) e).getResponse();
