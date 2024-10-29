@@ -1,9 +1,8 @@
 package cvds.todo.backend.controller;
 
 import cvds.todo.backend.exceptions.UserException;
-import cvds.todo.backend.model.LoginModel;
 import cvds.todo.backend.model.UserModel;
-import cvds.todo.backend.services.SessionService;
+import cvds.todo.backend.services.AuthorizationService;
 import cvds.todo.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +19,7 @@ public class UserController {
     private UserService userService;
 
     @Autowired
-    private SessionService sessionService;
+    private AuthorizationService authorizationService;
 
     @PostMapping
     public ResponseEntity<?> createUserAsUser(@RequestBody UserModel user) {
@@ -36,9 +35,10 @@ public class UserController {
     }
 
     @PostMapping("/admin")
-    public ResponseEntity<?> createUserAsAdmin(@RequestBody UserModel user, @RequestBody Set<String> roles) {
+    public ResponseEntity<?> createUserAsAdmin(@RequestHeader("Authorizacion") String token, @RequestBody UserModel user, @RequestBody String roles) {
         try {
             final UserModel modelUser = userService.createUserAsAdmin(user, roles);
+            this.authorizationService.adminResource(token);
             return ResponseEntity.status(201).body(Collections.singletonMap("message", "The user " + modelUser.getUsername() + " was created successfully."));
         } catch (Exception e) {
             if (e instanceof UserException) {
@@ -48,22 +48,10 @@ public class UserController {
         }
     }
 
-    @PostMapping("/auth")
-    public ResponseEntity<?> loginUser(@RequestBody LoginModel login) {
-        try {
-            UserModel user = userService.loginUser(login.getUsername(), login.getPassword());
-            return ResponseEntity.ok().body(Collections.singletonMap("cookie", this.sessionService.createSessionCookie(user)));
-        } catch (Exception e) {
-            if (e instanceof UserException) {
-                return ((UserException) e).getResponse();
-            }
-            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Server error"));
-        }
-    }
-
     @GetMapping("/{id}")
-    public ResponseEntity<?> getUserById(@PathVariable String id) {
+    public ResponseEntity<?> getUserById(@RequestHeader("Authorizacion") String token, @PathVariable String id) {
         try {
+            this.authorizationService.adminResource(token);
             return ResponseEntity.ok(userService.getUserById(id));
 
         } catch (Exception e) {
@@ -75,8 +63,9 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllUsers() {
+    public ResponseEntity<?> getAllUsers(@RequestHeader("Authorizacion") String token) {
         try {
+            this.authorizationService.adminResource(token);
             return ResponseEntity.ok(userService.getAllUsers());
         } catch (Exception e) {
             if (e instanceof UserException) {
@@ -87,8 +76,9 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@PathVariable String id, @RequestBody UserModel user) {
+    public ResponseEntity<?> updateUser(@RequestHeader("Authorizacion") String token, @PathVariable String id, @RequestBody UserModel user) {
         try {
+            this.authorizationService.adminResource(token);
             return ResponseEntity.ok(userService.updateUser(id, user));
         } catch (Exception e) {
             if (e instanceof UserException) {
@@ -99,9 +89,10 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@PathVariable String id) {
+    public ResponseEntity<?> deleteUser(@RequestHeader("Authorizacion") String token, @PathVariable String id) {
         try {
             userService.deleteUser(id);
+            this.authorizationService.adminResource(token);
             return ResponseEntity.ok(Collections.singletonMap("message", "User deleted successfully"));
 
         } catch (Exception e) {

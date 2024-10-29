@@ -1,22 +1,21 @@
 package cvds.todo.backend.model;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
-@Document(collection = "users")
-public class UserModel {
+public class PublicUserModel {
     @Id
     private String id;
     private String username;
     private String email;
-    private String password;
-    private String roles;
+    private Set<String> roles = new HashSet<String>();
 
-    public UserModel() {
+    public PublicUserModel(UserModel user) {
+        username = user.getUsername();
+        email = user.getEmail();
+        id = user.getId();
     }
 
     public String getId() {
@@ -35,14 +34,6 @@ public class UserModel {
         this.username = username;
     }
 
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
     public String getEmail() {
         return email;
     }
@@ -51,11 +42,11 @@ public class UserModel {
         this.email = email;
     }
 
-    public String getRoles() {
+    public Set<String> getRoles() {
         return roles;
     }
 
-    public void setRoles(String roles) {
+    public void setRoles(Set<String> roles) {
         this.roles = roles;
     }
 }

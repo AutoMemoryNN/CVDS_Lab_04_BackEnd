@@ -24,6 +24,6 @@ public abstract class AppException extends Exception {
      * @return ResponseEntity containing the status code and exception message.
      */
     public ResponseEntity<?> getResponse() {
-        return ResponseEntity.status(statusCode).body(Collections.singletonMap("Error", this.getMessage()));
+        return ResponseEntity.status(statusCode).body(Collections.singletonMap("error", this.getMessage()));
     }
 }

@@ -2,7 +2,7 @@ package cvds.todo.backend.services;
 
 import cvds.todo.backend.exceptions.UserException;
 import cvds.todo.backend.interfeces.UsersService;
-import cvds.todo.backend.model.Role;
+import cvds.todo.backend.enums.Role;
 import cvds.todo.backend.model.UserModel;
 import cvds.todo.backend.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,26 +19,21 @@ public class UserService implements UsersService {
 
 
     private UserModel createUser(UserModel user) throws UserException {
+        this.validateUser(user);
         user.setId(UUID.randomUUID().toString());
         BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
         user.setPassword(passwordEncoder.encode(user.getPassword()));
-        this.validateUser(user);
         userRepository.save(user);
         return user;
     }
 
     public UserModel createUserAsUser(UserModel user) throws UserException {
-        final HashSet<String> roles = new HashSet<String>(1);
-        roles.add(Role.USER.name());
-        user.setRoles(roles);
-
+        user.setRoles(Role.ROLE_ADMIN.name());
         return this.createUser(user);
     }
 
-    public UserModel createUserAsAdmin(UserModel user, Set<String> roles) throws UserException {
-        for (String role : roles) {
-            this.validateRole(role);
-        }
+    public UserModel createUserAsAdmin(UserModel user, String roles) throws UserException {
+        this.validateRole(user.getRoles());
         user.setRoles(roles);
 
         return this.createUser(user);
@@ -102,8 +97,8 @@ public class UserService implements UsersService {
         if (user == null) {
             throw new UserException.UserInvalidValueException("User cannot be null");
         }
-        if (user.getUsername() == null || user.getPassword() == null || user.getId() == null) {
-            throw new UserException.UserInvalidValueException("Username, password and id cannot be null");
+        if (user.getUsername() == null || user.getPassword() == null || user.getEmail() == null) {
+            throw new UserException.UserInvalidValueException("Username or password or email cannot be null");
         }
         if (userRepository.findByUsername(user.getUsername()) != null) {
             throw new UserException.UserConflictException(user.getUsername());
@@ -111,22 +106,43 @@ public class UserService implements UsersService {
         if (userRepository.findByEmail(user.getEmail()) != null) {
             throw new UserException.UserConflictException(user.getEmail());
         }
-        String username = user.getUsername();
-        if (username.length() > 30 || username.length() < 5) {
-            throw new UserException.UserInvalidValueException("Username must be between 5 and 30 characters");
-        }
-        if (!Pattern.matches("^[a-zA-Z0-9.!@#$%^&*()_+=-]+$", username)) {
-            throw new UserException.UserInvalidValueException("Username can only contain alphanumeric characters, hyphens, and underscores");
-        }
-        String email = user.getEmail();
-        if (email == null || !Pattern.matches("^[\\w-.]+@[\\w-]+\\.[a-z]{2,}$", email)) {
-            throw new UserException.UserInvalidValueException("Email format is invalid");
-        }
+
+        validateUsername(user.getUsername());
+        validateEmail(user.getEmail());
+        validatePassword(user.getPassword());
+
         if (user.getRoles() == null || user.getRoles().isEmpty()) {
             throw new UserException.UserInvalidValueException("All users must have a role");
         }
-        for (String role : user.getRoles()) {
-            this.validateRole(role);
+
+        this.validateRole(user.getRoles());
+    }
+
+    private void validateUsername(String username) throws UserException.UserInvalidValueException {
+        if (username.length() > 30 || username.length() < 5) {
+            throw new UserException.UserInvalidValueException("Username must be between 5 and 30 characters");
+        }
+        if (!Pattern.matches("^[a-zA-Z0-9._-]+$", username)) {
+            throw new UserException.UserInvalidValueException("Username can only contain alphanumeric characters, dots, hyphens, and underscores");
+        }
+    }
+
+    private void validateEmail(String email) throws UserException.UserInvalidValueException {
+        String emailPattern = "^[\\w.-]+@[\\w-]+(\\.[\\w-]+)+$";
+        if (email == null || !Pattern.matches(emailPattern, email)) {
+            throw new UserException.UserInvalidValueException("Email format is invalid");
+        }
+    }
+
+    private void validatePassword(String password) throws UserException.UserInvalidValueException {
+        if (password == null) {
+            throw new UserException.UserInvalidValueException("Password cannot be null");
+        }
+        if (password.length() < 6 || password.length() > 29) {
+            throw new UserException.UserInvalidValueException("Password must be between 6 and 29 characters");
+        }
+        if (!Pattern.matches("^[a-zA-Z0-9!@#$%^&*()\\-_=+]+$", password)) {
+            throw new UserException.UserInvalidValueException("Illegal password, try another");
         }
     }
 

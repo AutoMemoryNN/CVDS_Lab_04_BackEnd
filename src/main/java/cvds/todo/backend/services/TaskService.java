@@ -6,7 +6,7 @@ import cvds.todo.backend.exceptions.TaskException;
 import cvds.todo.backend.model.UserModel;
 import cvds.todo.backend.repository.TaskRepository;
 import cvds.todo.backend.interfeces.TasksService;
-import cvds.todo.backend.model.Difficulty;
+import cvds.todo.backend.enums.Difficulty;
 import cvds.todo.backend.model.TaskModel;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -118,6 +118,8 @@ public class TaskService implements TasksService {
             final LocalDateTime randomDateTime = this.getRandomDateTime(LocalDate.now(), LocalTime.now(), 30);
             task.setCreatedAt(randomDateTime);
             task.setUpdatedAt(randomDateTime);
+
+            task.setOwnerIds(Collections.singletonList(user.getId()));
 
             this.isValidTask(task);
 
