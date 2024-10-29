@@ -8,13 +8,12 @@ import cvds.todo.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 
-@Controller
+@RequestMapping("/")
+@RestController
 public class AuthenticationController {
     @Autowired
     private UserService userService;
@@ -22,7 +21,7 @@ public class AuthenticationController {
     @Autowired
     private SessionService sessionService;
 
-    @PostMapping("/auth")
+    @PostMapping("auth")
     public ResponseEntity<?> loginUser(@RequestBody LoginModel login) {
         try {
             UserModel user = userService.loginUser(login.getUsername(), login.getPassword());
@@ -35,7 +34,7 @@ public class AuthenticationController {
         }
     }
 
-    @PostMapping("/logout")
+    @PostMapping("logout")
     public ResponseEntity<?> logoutUser(@RequestHeader("Authentication") String token) {
         try {
             this.sessionService.invalidateSession(token);
