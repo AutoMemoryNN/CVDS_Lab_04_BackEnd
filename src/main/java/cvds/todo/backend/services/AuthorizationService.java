@@ -13,7 +13,7 @@ public class AuthorizationService {
 
     public void adminResource(String token) throws SessionException {
         UserModel user = sessionService.getUserFromSession(token);
-        if (!user.getRoles().contains(Role.ROLE_ADMIN.name())) {
+        if (!user.getRoles().equals(Role.ROLE_ADMIN.name())) {
             throw new SessionException.InvalidSessionException("No access");
         }
     }

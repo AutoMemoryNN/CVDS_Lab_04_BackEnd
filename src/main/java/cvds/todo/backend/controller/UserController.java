@@ -35,7 +35,7 @@ public class UserController {
     }
 
     @PostMapping("/admin")
-    public ResponseEntity<?> createUserAsAdmin(@RequestHeader("Authorizacion") String token, @RequestBody UserModel user, @RequestBody Set<String> roles) {
+    public ResponseEntity<?> createUserAsAdmin(@RequestHeader("Authorizacion") String token, @RequestBody UserModel user, @RequestBody String roles) {
         try {
             final UserModel modelUser = userService.createUserAsAdmin(user, roles);
             this.authorizationService.adminResource(token);

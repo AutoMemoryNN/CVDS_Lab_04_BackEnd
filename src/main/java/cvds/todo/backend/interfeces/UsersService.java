@@ -19,7 +19,7 @@ public interface UsersService {
      * @return UserModel The created user object with updated details.
      * @throws AppException If an error occurs during user creation.
      */
-    UserModel createUserAsAdmin(UserModel user, Set<String> role) throws AppException;
+    UserModel createUserAsAdmin(UserModel user, String role) throws AppException;
 
     /**
      * Creates a user with standard permissions.

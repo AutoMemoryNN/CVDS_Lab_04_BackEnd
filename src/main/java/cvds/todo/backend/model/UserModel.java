@@ -14,7 +14,7 @@ public class UserModel {
     private String username;
     private String email;
     private String password;
-    private Set<String> roles = new HashSet<String>();
+    private String roles;
 
     public UserModel() {
     }
@@ -51,11 +51,11 @@ public class UserModel {
         this.email = email;
     }
 
-    public Set<String> getRoles() {
+    public String getRoles() {
         return roles;
     }
 
-    public void setRoles(Set<String> roles) {
+    public void setRoles(String roles) {
         this.roles = roles;
     }
 }

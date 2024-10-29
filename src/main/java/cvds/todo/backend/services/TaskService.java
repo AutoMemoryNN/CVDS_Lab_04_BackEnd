@@ -119,6 +119,8 @@ public class TaskService implements TasksService {
             task.setCreatedAt(randomDateTime);
             task.setUpdatedAt(randomDateTime);
 
+            task.setOwnerIds(Collections.singletonList(user.getId()));
+
             this.isValidTask(task);
 
             tasks.add(task);

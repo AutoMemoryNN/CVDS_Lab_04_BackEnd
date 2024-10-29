@@ -28,17 +28,12 @@ public class UserService implements UsersService {
     }
 
     public UserModel createUserAsUser(UserModel user) throws UserException {
-        final HashSet<String> roles = new HashSet<String>(1);
-        roles.add(Role.ROLE_USER.name());
-        user.setRoles(roles);
-
+        user.setRoles(Role.ROLE_ADMIN.name());
         return this.createUser(user);
     }
 
-    public UserModel createUserAsAdmin(UserModel user, Set<String> roles) throws UserException {
-        for (String role : roles) {
-            this.validateRole(role);
-        }
+    public UserModel createUserAsAdmin(UserModel user, String roles) throws UserException {
+        this.validateRole(user.getRoles());
         user.setRoles(roles);
 
         return this.createUser(user);
@@ -119,9 +114,8 @@ public class UserService implements UsersService {
         if (user.getRoles() == null || user.getRoles().isEmpty()) {
             throw new UserException.UserInvalidValueException("All users must have a role");
         }
-        for (String role : user.getRoles()) {
-            this.validateRole(role);
-        }
+
+        this.validateRole(user.getRoles());
     }
 
     private void validateUsername(String username) throws UserException.UserInvalidValueException {

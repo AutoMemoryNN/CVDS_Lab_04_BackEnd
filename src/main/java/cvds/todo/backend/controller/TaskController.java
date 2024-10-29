@@ -4,12 +4,14 @@ import cvds.todo.backend.exceptions.AppException;
 import cvds.todo.backend.exceptions.SessionException;
 import cvds.todo.backend.model.TaskModel;
 import cvds.todo.backend.model.UserModel;
+import cvds.todo.backend.services.AuthorizationService;
 import cvds.todo.backend.services.SessionService;
 import cvds.todo.backend.services.TaskService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
@@ -27,6 +29,9 @@ public class TaskController {
     @Autowired
     private SessionService sessionService;
 
+    @Autowired
+    private AuthorizationService authorizationService;
+
     /**
      * Obtener todas las tareas.
      *
@@ -43,7 +48,7 @@ public class TaskController {
             if (e instanceof AppException) {
                 return ((AppException) e).getResponse();
             } else {
-                return ResponseEntity.status(500).body(e.getMessage());
+                return ResponseEntity.status(500).body(Collections.singletonMap("error", "Server error"));
             }
         }
     }
@@ -64,7 +69,7 @@ public class TaskController {
             if (e instanceof AppException) {
                 return ((AppException) e).getResponse();
             }
-            return ResponseEntity.status(500).body(e.getMessage());
+            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Server error"));
         }
     }
 
@@ -85,7 +90,7 @@ public class TaskController {
             if (e instanceof AppException) {
                 return ((AppException) e).getResponse();
             }
-            return ResponseEntity.status(500).body(e.getMessage());
+            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Server error"));
         }
     }
 
@@ -107,7 +112,7 @@ public class TaskController {
             if (e instanceof AppException) {
                 return ((AppException) e).getResponse();
             }
-            return ResponseEntity.status(500).body(e.getMessage());
+            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Server error"));
         }
     }
 
@@ -128,7 +133,7 @@ public class TaskController {
             if (e instanceof AppException) {
                 return ((AppException) e).getResponse();
             }
-            return ResponseEntity.status(500).body(e.getMessage());
+            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Server error"));
         }
     }
 
@@ -148,7 +153,7 @@ public class TaskController {
             if (e instanceof AppException) {
                 return ((AppException) e).getResponse();
             }
-            return ResponseEntity.status(500).body(e.getMessage());
+            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Server error"));
         }
     }
 
@@ -161,13 +166,14 @@ public class TaskController {
     public ResponseEntity<?> generateTasks(@RequestHeader("Authorization") String sessionToken) {
         try {
             UserModel userLogged = this.getUserFromSessions(sessionToken);
+            authorizationService.adminResource(sessionToken);
             List<TaskModel> newTasks = taskService.generateExamples(userLogged);
             return ResponseEntity.status(201).body(newTasks.size() + " Tasks were generated");
         } catch (Exception e) {
             if (e instanceof AppException) {
                 return ((AppException) e).getResponse();
             }
-            return ResponseEntity.status(500).body(e.getMessage());
+            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Server error"));
         }
     }
 
