@@ -7,11 +7,11 @@ import cvds.todo.backend.services.SessionService;
 import cvds.todo.backend.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 
+//TODO : Password, list for roles, user name
 @RequestMapping("/")
 @RestController
 public class AuthenticationController {
@@ -30,6 +30,16 @@ public class AuthenticationController {
             if (e instanceof UserException) {
                 return ((UserException) e).getResponse();
             }
+            return ResponseEntity.status(500).body(Collections.singletonMap("error", "Server error"));
+        }
+    }
+
+    @GetMapping("auth")
+    public ResponseEntity<?> getUser(@RequestHeader("Authorization") String token) {
+        try {
+            sessionService.isSessionActive(token);
+            return ResponseEntity.ok().body(sessionService.getUserFromSession(token));
+        } catch (Exception e) {
             return ResponseEntity.status(500).body(Collections.singletonMap("error", "Server error"));
         }
     }

@@ -29,7 +29,7 @@ public class UserService implements UsersService {
 
     public UserModel createUserAsUser(UserModel user) throws UserException {
         final HashSet<String> roles = new HashSet<String>(1);
-        roles.add(Role.USER.name());
+        roles.add(Role.ROLE_USER.name());
         user.setRoles(roles);
 
         return this.createUser(user);

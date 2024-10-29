@@ -1,5 +1,5 @@
 package cvds.todo.backend.enums;
 
 public enum Role {
-    USER, ADMIN, GUESS
+    ROLE_USER, ROLE_ADMIN, ROLE_GUESS
 }
