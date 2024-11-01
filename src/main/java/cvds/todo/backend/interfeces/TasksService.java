@@ -7,77 +7,84 @@ import cvds.todo.backend.model.UserModel;
 import java.util.List;
 
 /**
- * Interface for task management services.
- * Provides methods for creating, reading, updating, and deleting tasks.
+ * Interfaz para los servicios de gestión de tareas.
+ * Proporciona métodos para crear, leer, actualizar, eliminar y validar tareas.
  */
 public interface TasksService {
 
     /**
-     * Get all tasks.
+     * Obtiene todas las tareas de un usuario específico.
      *
-     * @return List of all available tasks.
-     * @throws AppException if an error occurs while retrieving the tasks.
+     * @param user El usuario para el que se recuperan las tareas.
+     * @return Lista de todas las tareas disponibles del usuario.
+     * @throws AppException Si ocurre un error al recuperar las tareas.
      */
     List<TaskModel> getAllTasks(UserModel user) throws AppException;
 
     /**
-     * Get a task by its ID.
+     * Obtiene una tarea por su ID.
      *
-     * @param id Identifier of the task.
-     * @return The task corresponding to the provided ID.
-     * @throws AppException if an error occurs while retrieving the task.
+     * @param id   Identificador de la tarea.
+     * @param user El usuario propietario de la tarea.
+     * @return La tarea correspondiente al ID proporcionado.
+     * @throws AppException Si ocurre un error al recuperar la tarea.
      */
     TaskModel getTaskById(String id, UserModel user) throws AppException;
 
     /**
-     * Create a new task.
+     * Crea una nueva tarea.
      *
-     * @param task Task model to create.
-     * @return The created task.
-     * @throws AppException if an error occurs while creating the task.
+     * @param task La tarea a crear.
+     * @param user El usuario propietario de la tarea.
+     * @return La tarea creada.
+     * @throws AppException Si ocurre un error al crear la tarea.
      */
     TaskModel createTask(TaskModel task, UserModel user) throws AppException;
 
     /**
-     * Update an existing task by its ID.
+     * Actualiza una tarea existente por su ID.
      *
-     * @param id   Identifier of the task to update.
-     * @param task Updated task model.
-     * @return The updated task.
-     * @throws AppException if an error occurs while updating the task.
+     * @param id   Identificador de la tarea a actualizar.
+     * @param task Modelo de la tarea actualizada.
+     * @param user El usuario propietario de la tarea.
+     * @return La tarea actualizada.
+     * @throws AppException Si ocurre un error al actualizar la tarea.
      */
     TaskModel updateTask(String id, TaskModel task, UserModel user) throws AppException;
 
     /**
-     * Delete a task by its ID.
+     * Elimina una tarea por su ID.
      *
-     * @param id Identifier of the task to delete.
-     * @return The deleted task.
-     * @throws AppException if an error occurs while deleting the task.
+     * @param id   Identificador de la tarea a eliminar.
+     * @param user El usuario propietario de la tarea.
+     * @return La tarea eliminada.
+     * @throws AppException Si ocurre un error al eliminar la tarea.
      */
     TaskModel deleteTask(String id, UserModel user) throws AppException;
 
     /**
-     * Generate examples of tasks.
+     * Genera tareas de ejemplo para el usuario especificado.
      *
-     * @return List of generated example tasks.
-     * @throws AppException if an error occurs while generating the tasks.
+     * @param user El usuario para el que se generan las tareas.
+     * @return Lista de tareas de ejemplo generadas.
+     * @throws AppException Si ocurre un error al generar las tareas.
      */
     List<TaskModel> generateExamples(UserModel user) throws AppException;
 
     /**
-     * Delete all tasks.
+     * Elimina todas las tareas de un usuario específico.
      *
-     * @return List of all deleted tasks.
-     * @throws AppException if an error occurs while deleting the tasks.
+     * @param user El usuario cuyas tareas serán eliminadas.
+     * @return Lista de todas las tareas eliminadas.
+     * @throws AppException Si ocurre un error al eliminar las tareas.
      */
     List<TaskModel> deleteAllTasks(UserModel user) throws AppException;
 
     /**
-     * Validate a task before insert in database.
+     * Valida una tarea antes de insertarla en la base de datos.
      *
-     * @param task Task model to validate.
-     * @throws AppException if the task is not valid.
+     * @param task Modelo de la tarea a validar.
+     * @throws AppException Si la tarea no es válida.
      */
     void isValidTask(TaskModel task) throws AppException;
 }

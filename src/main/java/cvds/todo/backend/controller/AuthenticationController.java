@@ -12,16 +12,28 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
 
-//TODO : list for roles
+/**
+ * Controlador REST para la autenticación de usuarios.
+ * Proporciona endpoints para el inicio de sesión, obtención de información del usuario autenticado y cierre de sesión.
+ */
 @RequestMapping("/")
 @RestController
 public class AuthenticationController {
-    @Autowired
-    private UserService userService;
 
     @Autowired
-    private SessionService sessionService;
+    private UserService userService; // Servicio de lógica de usuario
 
+    @Autowired
+    private SessionService sessionService; // Servicio de gestión de sesiones
+
+    /**
+     * Iniciar sesión.
+     * Endpoint para autenticar un usuario en el sistema. Al recibir las credenciales,
+     * intenta autenticar al usuario y, si es exitoso, genera una cookie de sesión.
+     *
+     * @param login Un objeto LoginModel que contiene las credenciales de inicio de sesión (username y password).
+     * @return ResponseEntity con la cookie de sesión en caso de éxito o un mensaje de error en caso de fallo.
+     */
     @PostMapping("auth")
     public ResponseEntity<?> loginUser(@RequestBody LoginModel login) {
         try {
@@ -35,6 +47,14 @@ public class AuthenticationController {
         }
     }
 
+    /**
+     * Obtener información del usuario autenticado.
+     * Endpoint para validar el estado de la sesión y devolver la información pública del usuario autenticado.
+     *
+     * @param token El token de autorización en el encabezado de la solicitud.
+     * @return ResponseEntity con el modelo PublicUserModel que contiene la información del usuario si la sesión es válida,
+     * o un mensaje de error si hay problemas con la autenticación o la sesión.
+     */
     @GetMapping("auth")
     public ResponseEntity<?> getUser(@RequestHeader("Authorization") String token) {
         try {
@@ -45,6 +65,13 @@ public class AuthenticationController {
         }
     }
 
+    /**
+     * Cerrar sesión.
+     * Endpoint para cerrar la sesión del usuario autenticado invalidando su token de sesión.
+     *
+     * @param token El token de autenticación en el encabezado de la solicitud.
+     * @return ResponseEntity con un mensaje de éxito si la sesión fue cerrada correctamente o un mensaje de error en caso de fallo.
+     */
     @PostMapping("logout")
     public ResponseEntity<?> logoutUser(@RequestHeader("Authentication") String token) {
         try {

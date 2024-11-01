@@ -7,14 +7,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+/**
+ * Modelo que representa un usuario en el sistema.
+ * Contiene la información básica del usuario, incluyendo su identificación, nombre de usuario, correo, contraseña y roles.
+ */
 @Document(collection = "users")
 public class UserModel {
     @Id
-    private String id;
-    private String username;
-    private String email;
-    private String password;
-    private String roles;
+    private String id;  // Identificador único del usuario
+    private String username;  // Nombre de usuario
+    private String email;  // Correo electrónico del usuario
+    private String password;  // Contraseña del usuario
+    private String roles;  // Roles asignados al usuario, como "USER" o "ADMIN"
 
     public UserModel() {
     }

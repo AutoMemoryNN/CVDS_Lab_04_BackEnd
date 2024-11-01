@@ -12,12 +12,23 @@ import org.springframework.stereotype.Service;
 import java.util.*;
 import java.util.regex.Pattern;
 
+/**
+ * Servicio para la gestión de usuarios en el sistema.
+ * Proporciona métodos para crear, actualizar, eliminar, validar y autenticar usuarios.
+ */
 @Service
 public class UserService implements UsersService {
+
     @Autowired
     private UserRepository userRepository;
 
-
+    /**
+     * Crea un nuevo usuario y lo guarda en la base de datos después de validarlo.
+     *
+     * @param user El usuario a crear.
+     * @return El usuario creado.
+     * @throws UserException Si el usuario no es válido o ya existe.
+     */
     private UserModel createUser(UserModel user) throws UserException {
         this.validateUser(user);
         user.setId(UUID.randomUUID().toString());
@@ -27,18 +38,40 @@ public class UserService implements UsersService {
         return user;
     }
 
+    /**
+     * Crea un usuario con permisos de usuario estándar.
+     *
+     * @param user El usuario a crear.
+     * @return El usuario creado.
+     * @throws UserException Si el usuario no es válido.
+     */
     public UserModel createUserAsUser(UserModel user) throws UserException {
         user.setRoles(Role.ROLE_ADMIN.name());
         return this.createUser(user);
     }
 
+    /**
+     * Crea un usuario con permisos de administrador.
+     *
+     * @param user  El usuario a crear.
+     * @param roles El rol del usuario.
+     * @return El usuario creado.
+     * @throws UserException Si el rol no es válido.
+     */
     public UserModel createUserAsAdmin(UserModel user, String roles) throws UserException {
         this.validateRole(user.getRoles());
         user.setRoles(roles);
-
         return this.createUser(user);
     }
 
+    /**
+     * Actualiza un usuario existente.
+     *
+     * @param id   El ID del usuario a actualizar.
+     * @param user Datos del usuario para actualizar.
+     * @return El usuario actualizado.
+     * @throws UserException Si el usuario no existe o los datos no son válidos.
+     */
     public UserModel updateUser(String id, UserModel user) throws UserException {
         Optional<UserModel> existingUser = userRepository.findById(id);
 
@@ -62,11 +95,23 @@ public class UserService implements UsersService {
         throw new UserException.UserNotFoundException(user.getUsername());
     }
 
-
+    /**
+     * Obtiene todos los usuarios.
+     *
+     * @return Lista de todos los usuarios.
+     * @throws UserException En caso de error al obtener los usuarios.
+     */
     public List<UserModel> getAllUsers() throws UserException {
         return userRepository.findAll();
     }
 
+    /**
+     * Obtiene un usuario específico por su ID.
+     *
+     * @param id ID del usuario.
+     * @return El usuario si se encuentra.
+     * @throws UserException Si el usuario no se encuentra.
+     */
     public UserModel getUserById(String id) throws UserException {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserException.UserNotFoundException(id));
@@ -77,6 +122,14 @@ public class UserService implements UsersService {
         return null;
     }
 
+    /**
+     * Autentica a un usuario según su nombre de usuario y contraseña.
+     *
+     * @param username Nombre de usuario.
+     * @param password Contraseña.
+     * @return El usuario autenticado.
+     * @throws UserException Si las credenciales son inválidas.
+     */
     public UserModel loginUser(String username, String password) throws UserException {
         UserModel userModel = this.userRepository.findByUsername(username);
 
@@ -93,6 +146,12 @@ public class UserService implements UsersService {
         }
     }
 
+    /**
+     * Valida que un usuario sea correcto en cuanto a formato de nombre, email y contraseña.
+     *
+     * @param user El usuario a validar.
+     * @throws UserException Si el usuario es nulo o sus datos no son válidos.
+     */
     public void validateUser(UserModel user) throws UserException {
         if (user == null) {
             throw new UserException.UserInvalidValueException("User cannot be null");
@@ -118,6 +177,12 @@ public class UserService implements UsersService {
         this.validateRole(user.getRoles());
     }
 
+    /**
+     * Valida el formato del nombre de usuario.
+     *
+     * @param username Nombre de usuario.
+     * @throws UserException.UserInvalidValueException Si el nombre no es válido.
+     */
     private void validateUsername(String username) throws UserException.UserInvalidValueException {
         if (username.length() > 30 || username.length() < 5) {
             throw new UserException.UserInvalidValueException("Username must be between 5 and 30 characters");
@@ -127,6 +192,12 @@ public class UserService implements UsersService {
         }
     }
 
+    /**
+     * Valida el formato del email.
+     *
+     * @param email Email del usuario.
+     * @throws UserException.UserInvalidValueException Si el email no es válido.
+     */
     private void validateEmail(String email) throws UserException.UserInvalidValueException {
         String emailPattern = "^[\\w.-]+@[\\w-]+(\\.[\\w-]+)+$";
         if (email == null || !Pattern.matches(emailPattern, email)) {
@@ -134,6 +205,12 @@ public class UserService implements UsersService {
         }
     }
 
+    /**
+     * Valida el formato de la contraseña.
+     *
+     * @param password Contraseña del usuario.
+     * @throws UserException.UserInvalidValueException Si la contraseña no es válida.
+     */
     private void validatePassword(String password) throws UserException.UserInvalidValueException {
         if (password == null) {
             throw new UserException.UserInvalidValueException("Password cannot be null");
@@ -146,6 +223,12 @@ public class UserService implements UsersService {
         }
     }
 
+    /**
+     * Valida el rol del usuario.
+     *
+     * @param role Rol a validar.
+     * @throws UserException Si el rol no es válido.
+     */
     public void validateRole(String role) throws UserException {
         try {
             Role.valueOf(role.toUpperCase());
@@ -153,5 +236,4 @@ public class UserService implements UsersService {
             throw new UserException.UserInvalidValueException("role: " + role);
         }
     }
-
 }

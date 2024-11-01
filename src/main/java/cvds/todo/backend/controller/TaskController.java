@@ -24,18 +24,19 @@ import java.util.List;
 public class TaskController {
 
     @Autowired
-    private TaskService taskService;
+    private TaskService taskService; // Servicio para la lógica de negocio de tareas
 
     @Autowired
-    private SessionService sessionService;
+    private SessionService sessionService; // Servicio para la gestión de sesiones
 
     @Autowired
-    private AuthorizationService authorizationService;
+    private AuthorizationService authorizationService; // Servicio para verificar autorizaciones de usuario
 
     /**
-     * Obtener todas las tareas.
+     * Obtener todas las tareas del usuario autenticado.
      *
-     * @return Lista de todas las tareas.
+     * @param sessionToken Token de sesión para autenticar al usuario.
+     * @return Una lista con todas las tareas del usuario o un mensaje de error.
      */
     @GetMapping
     public ResponseEntity<?> getAllTasks(@RequestHeader("Authorization") String sessionToken) {
@@ -54,10 +55,11 @@ public class TaskController {
     }
 
     /**
-     * Obtener una tarea por su ID.
+     * Obtener una tarea específica por su ID.
      *
-     * @param id Identificador de la tarea.
-     * @return La tarea correspondiente al ID proporcionado.
+     * @param sessionToken Token de sesión del usuario.
+     * @param id           Identificador de la tarea a recuperar.
+     * @return La tarea correspondiente al ID proporcionado o un mensaje de error.
      */
     @GetMapping("/{id}")
     public ResponseEntity<?> getTaskById(@RequestHeader("Authorization") String sessionToken, @PathVariable("id") String id) {
@@ -76,8 +78,9 @@ public class TaskController {
     /**
      * Crear una nueva tarea.
      *
-     * @param task Modelo de tarea enviado en el cuerpo de la solicitud.
-     * @return El UUID de la nueva tarea creada.
+     * @param sessionToken Token de sesión del usuario autenticado.
+     * @param task         Modelo de tarea enviado en el cuerpo de la solicitud.
+     * @return El UUID de la nueva tarea creada o un mensaje de error.
      */
     @PostMapping
     public ResponseEntity<?> createTask(@RequestHeader("Authorization") String sessionToken, @RequestBody TaskModel task) {
@@ -97,9 +100,10 @@ public class TaskController {
     /**
      * Actualizar una tarea existente por su ID.
      *
-     * @param id   Identificador de la tarea a actualizar.
-     * @param task Modelo de tarea actualizado.
-     * @return La tarea actualizada.
+     * @param sessionToken Token de sesión del usuario.
+     * @param id           Identificador de la tarea a actualizar.
+     * @param task         Modelo de tarea actualizado.
+     * @return La tarea actualizada o un mensaje de error.
      */
     @PatchMapping("/{id}")
     public ResponseEntity<?> updateTask(@RequestHeader("Authorization") String sessionToken, @PathVariable("id") String id, @RequestBody TaskModel task) {
@@ -119,8 +123,9 @@ public class TaskController {
     /**
      * Eliminar una tarea por su ID.
      *
-     * @param id Identificador de la tarea a eliminar.
-     * @return Respuesta sin contenido.
+     * @param sessionToken Token de sesión del usuario autenticado.
+     * @param id           Identificador de la tarea a eliminar.
+     * @return La tarea eliminada o un mensaje de error.
      */
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteTask(@RequestHeader("Authorization") String sessionToken, @PathVariable("id") String id) {
@@ -138,13 +143,13 @@ public class TaskController {
     }
 
     /**
-     * Eliminar todas las tareas.
+     * Eliminar todas las tareas del usuario autenticado.
      *
-     * @return Un mensaje indicando cuántas tareas fueron eliminadas exitosamente.
+     * @param sessionToken Token de sesión del usuario.
+     * @return Un mensaje indicando cuántas tareas fueron eliminadas o un mensaje de error.
      */
     @DeleteMapping("/all")
     public ResponseEntity<?> deleteAllTasks(@RequestHeader("Authorization") String sessionToken) {
-
         try {
             UserModel userLogged = this.getUserFromSessions(sessionToken);
             List<TaskModel> taskDeleted = this.taskService.deleteAllTasks(userLogged);
@@ -158,9 +163,10 @@ public class TaskController {
     }
 
     /**
-     * Generar tareas de ejemplo.
+     * Generar tareas de ejemplo para el usuario autenticado.
      *
-     * @return Un mensaje indicando cuántas tareas fueron generadas.
+     * @param sessionToken Token de sesión del usuario autenticado.
+     * @return Un mensaje indicando cuántas tareas fueron generadas o un mensaje de error.
      */
     @PostMapping("/gen")
     public ResponseEntity<?> generateTasks(@RequestHeader("Authorization") String sessionToken) {
@@ -178,9 +184,9 @@ public class TaskController {
     }
 
     /**
-     * Endpoint for verify service state
+     * Verificar el estado del servicio.
      *
-     * @return message
+     * @return Un mensaje indicando el estado del servidor.
      */
     @GetMapping("/health")
     public ResponseEntity<?> checkHealth() {
@@ -190,6 +196,13 @@ public class TaskController {
         return ResponseEntity.ok(response);
     }
 
+    /**
+     * Obtener el usuario autenticado desde el token de sesión.
+     *
+     * @param sessionToken Token de sesión del usuario.
+     * @return El modelo de usuario autenticado o null si la sesión es inválida.
+     * @throws SessionException Si la sesión no es válida.
+     */
     private UserModel getUserFromSessions(String sessionToken) throws SessionException {
         if (sessionToken == null || !this.sessionService.isSessionActive(sessionToken)) {
             return null;
@@ -197,4 +210,3 @@ public class TaskController {
         return this.sessionService.getUserFromSession(sessionToken);
     }
 }
-

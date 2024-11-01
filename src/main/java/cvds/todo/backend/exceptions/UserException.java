@@ -1,31 +1,31 @@
 package cvds.todo.backend.exceptions;
 
 /**
- * UserException is a custom exception class that extends AppException.
- * This serves as the base class for all user-related exceptions, allowing
- * specific error handling for different situations like not found, invalid values, or conflicts.
+ * UserException es una clase de excepción personalizada que extiende AppException.
+ * Sirve como clase base para todas las excepciones relacionadas con usuarios, permitiendo
+ * un manejo específico de errores en situaciones como "no encontrado", valores inválidos o conflictos.
  */
 public class UserException extends AppException {
 
     /**
-     * Constructor for UserException.
+     * Constructor de UserException.
      *
-     * @param message    The error message.
-     * @param statusCode The HTTP status code associated with the error.
+     * @param message    El mensaje de error.
+     * @param statusCode El código de estado HTTP asociado al error.
      */
     public UserException(String message, Integer statusCode) {
         super(message, statusCode);
     }
 
     /**
-     * UserNotFoundException is thrown when a user cannot be found in the database.
+     * UserNotFoundException se lanza cuando un usuario no se encuentra en la base de datos.
      */
     public static class UserNotFoundException extends UserException {
 
         /**
-         * Constructor for UserNotFoundException.
+         * Constructor de UserNotFoundException.
          *
-         * @param username The username of the user that was not found.
+         * @param username El nombre de usuario del usuario que no se encontró.
          */
         public UserNotFoundException(String username) {
             super("User with ID: " + username + ", not found in the database.", 404);
@@ -33,14 +33,14 @@ public class UserException extends AppException {
     }
 
     /**
-     * UserInvalidValueException is thrown when an invalid value is encountered.
+     * UserInvalidValueException se lanza cuando se encuentra un valor inválido en los datos del usuario.
      */
     public static class UserInvalidValueException extends UserException {
 
         /**
-         * Constructor for UserInvalidValueException.
+         * Constructor de UserInvalidValueException.
          *
-         * @param value The invalid value encountered.
+         * @param value El valor inválido encontrado.
          */
         public UserInvalidValueException(String value) {
             super("Invalid value: " + value, 400);
@@ -48,14 +48,14 @@ public class UserException extends AppException {
     }
 
     /**
-     * UserConflictException is thrown when there is a conflict, such as a duplicate user.
+     * UserConflictException se lanza cuando ocurre un conflicto, como un usuario duplicado.
      */
     public static class UserConflictException extends UserException {
 
         /**
-         * Constructor for UserConflictException.
+         * Constructor de UserConflictException.
          *
-         * @param username The username that caused the conflict.
+         * @param username El nombre de usuario que causó el conflicto.
          */
         public UserConflictException(String username) {
             super("User with username: " + username + ", already exists in the database.", 409);

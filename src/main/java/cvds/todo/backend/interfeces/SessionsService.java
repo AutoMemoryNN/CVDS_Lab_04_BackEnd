@@ -4,45 +4,51 @@ import cvds.todo.backend.exceptions.SessionException;
 import cvds.todo.backend.model.UserModel;
 
 /**
- * Interface to manage user sessions in the system.
+ * Interfaz para gestionar las sesiones de usuario en el sistema.
+ * Define métodos para crear, renovar, validar y limpiar sesiones de usuario.
  */
 public interface SessionsService {
 
     /**
-     * Retrieves the user associated with a given session ID.
+     * Recupera el usuario asociado a un ID de sesión específico.
      *
-     * @param sessionId The unique identifier for the session.
-     * @return UserModel The user associated with the session, or null if the session is invalid.
+     * @param sessionId El identificador único de la sesión.
+     * @return UserModel El usuario asociado a la sesión, o null si la sesión no es válida.
+     * @throws SessionException Si hay un problema con la sesión.
      */
     UserModel getUserFromSession(String sessionId) throws SessionException;
 
     /**
-     * Creates a session and returns a new session ID for the specified user.
+     * Crea una sesión y devuelve un nuevo ID de sesión para el usuario especificado.
      *
-     * @param user The user for whom the session is created.
-     * @return String A unique session ID.
+     * @param user El usuario para el que se crea la sesión.
+     * @return String Un ID de sesión único.
+     * @throws SessionException Si ocurre un problema durante la creación de la sesión.
      */
     String createSessionCookie(UserModel user) throws SessionException;
 
     /**
-     * Renews the session to extend its lifetime.
+     * Renueva la sesión para extender su tiempo de vida.
      *
-     * @param sessionId The unique identifier for the session to renew.
-     * @return boolean True if the session was successfully renewed, false if the session is invalid.
+     * @param sessionId El identificador único de la sesión a renovar.
+     * @return boolean True si la sesión se renovó correctamente; false si la sesión no es válida.
+     * @throws SessionException Si ocurre un problema durante la renovación de la sesión.
      */
     boolean renewSession(String sessionId) throws SessionException;
 
     /**
-     * Checks if a session is currently active.
+     * Verifica si una sesión está actualmente activa.
      *
-     * @param sessionId The unique identifier for the session to check.
-     * @return boolean True if the session is active, false otherwise.
+     * @param sessionId El identificador único de la sesión a verificar.
+     * @return boolean True si la sesión está activa; false en caso contrario.
+     * @throws SessionException Si ocurre un problema al verificar la sesión.
      */
     boolean isSessionActive(String sessionId) throws SessionException;
 
     /**
-     * Removes all expired sessions from the system.
+     * Elimina todas las sesiones expiradas del sistema.
+     *
+     * @throws SessionException Si ocurre un problema al limpiar las sesiones expiradas.
      */
     void cleanExpiredSessions() throws SessionException;
 }
-

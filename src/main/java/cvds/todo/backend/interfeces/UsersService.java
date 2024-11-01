@@ -7,72 +7,73 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Interface for managing user operations in the system.
+ * Interfaz para gestionar operaciones de usuario en el sistema.
+ * Proporciona métodos para crear, actualizar, obtener, eliminar y autenticar usuarios.
  */
 public interface UsersService {
 
     /**
-     * Creates a user with administrator permissions.
+     * Crea un usuario con permisos de administrador.
      *
-     * @param user  User model to be created.
-     * @param role  Set of roles to assign to the user.
-     * @return UserModel The created user object with updated details.
-     * @throws AppException If an error occurs during user creation.
+     * @param user  Modelo de usuario a crear.
+     * @param role  Rol asignado al usuario.
+     * @return UserModel El objeto de usuario creado con los detalles actualizados.
+     * @throws AppException Si ocurre un error durante la creación del usuario.
      */
     UserModel createUserAsAdmin(UserModel user, String role) throws AppException;
 
     /**
-     * Creates a user with standard permissions.
+     * Crea un usuario con permisos estándar.
      *
-     * @param user User model to be created.
-     * @return UserModel The created user object with updated details.
-     * @throws AppException If an error occurs during user creation.
+     * @param user Modelo de usuario a crear.
+     * @return UserModel El objeto de usuario creado con los detalles actualizados.
+     * @throws AppException Si ocurre un error durante la creación del usuario.
      */
     UserModel createUserAsUser(UserModel user) throws AppException;
 
     /**
-     * Updates information for a specific user.
+     * Actualiza la información de un usuario específico.
      *
-     * @param id    Unique identifier of the user.
-     * @param user  User model with new data.
-     * @return UserModel The updated user object.
-     * @throws AppException If an error occurs during user update.
+     * @param id    Identificador único del usuario.
+     * @param user  Modelo de usuario con los datos actualizados.
+     * @return UserModel El objeto de usuario actualizado.
+     * @throws AppException Si ocurre un error durante la actualización del usuario.
      */
     UserModel updateUser(String id, UserModel user) throws AppException;
 
     /**
-     * Retrieves a list of all users in the system.
+     * Recupera una lista de todos los usuarios en el sistema.
      *
-     * @return List<UserModel> List of user objects.
-     * @throws AppException If an error occurs while retrieving the user list.
+     * @return List<UserModel> Lista de objetos de usuario.
+     * @throws AppException Si ocurre un error al recuperar la lista de usuarios.
      */
     List<UserModel> getAllUsers() throws AppException;
 
     /**
-     * Retrieves a specific user by their identifier.
+     * Recupera un usuario específico por su identificador.
      *
-     * @param id Unique identifier of the user.
-     * @return UserModel The user object, if it exists.
-     * @throws AppException If the user does not exist or an error occurs.
+     * @param id Identificador único del usuario.
+     * @return UserModel El objeto de usuario, si existe.
+     * @throws AppException Si el usuario no existe o si ocurre un error.
      */
     UserModel getUserById(String id) throws AppException;
 
     /**
-     * Deletes a specific user by their identifier.
+     * Elimina un usuario específico por su identificador.
      *
-     * @param id Unique identifier of the user.
-     * @return UserModel The deleted user object.
-     * @throws AppException If the user does not exist or an error occurs during deletion.
+     * @param id Identificador único del usuario.
+     * @return UserModel El objeto de usuario eliminado.
+     * @throws AppException Si el usuario no existe o si ocurre un error durante la eliminación.
      */
     UserModel deleteUser(String id) throws AppException;
 
     /**
-     * Authenticates a user based on their username and password.
+     * Autentica un usuario basado en su nombre de usuario y contraseña.
      *
-     * @param username Username for authentication.
-     * @param password User's password.
-     * @return UserModel The authenticated user object.
-     * @throws AppException If credentials are invalid or an authentication error occurs.
+     * @param username Nombre de usuario para la autenticación.
+     * @param password Contraseña del usuario.
+     * @return UserModel El objeto de usuario autenticado.
+     * @throws AppException Si las credenciales son inválidas o si ocurre un error de autenticación.
      */
     UserModel loginUser(String username, String password) throws AppException;
 }

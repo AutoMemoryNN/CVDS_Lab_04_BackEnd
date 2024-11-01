@@ -4,30 +4,38 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.time.LocalDateTime;
-
 import java.util.List;
-
 import java.util.Objects;
 
+/**
+ * Modelo que representa una tarea en el sistema.
+ * Este modelo contiene detalles de la tarea como nombre, descripción, prioridad, y otros atributos.
+ */
 @Document(collection = "tasks")
 public class TaskModel {
     @Id
-    private String id;
-    private String name;
-    private String description;
-    private String difficulty;
-    private int priority;
-    private LocalDateTime deadline;
-    private LocalDateTime createdAt;
-    private LocalDateTime updatedAt;
-    private boolean done;
+    private String id;  // Identificador único de la tarea
+    private String name;  // Nombre de la tarea
+    private String description;  // Descripción de la tarea
+    private String difficulty;  // Dificultad de la tarea (ej. "HIGH", "MEDIUM", "LOW")
+    private int priority;  // Prioridad de la tarea
+    private LocalDateTime deadline;  // Fecha límite para completar la tarea
+    private LocalDateTime createdAt;  // Fecha de creación de la tarea
+    private LocalDateTime updatedAt;  // Última fecha de actualización de la tarea
+    private boolean done;  // Estado de finalización de la tarea
+    private List<String> ownerIds;  // Lista de IDs de los propietarios de la tarea
 
-    private List<String> ownerIds;
-
-
+    /**
+     * Constructor vacío para inicialización.
+     */
     public TaskModel() {
     }
 
+    /**
+     * Constructor con ID para inicialización con identificador específico.
+     *
+     * @param id El identificador de la tarea.
+     */
     public TaskModel(String id) {
         this.id = id;
     }
@@ -112,13 +120,22 @@ public class TaskModel {
         this.ownerIds = ownerIds;
     }
 
+    /**
+     * Añade un ID de propietario a la tarea.
+     *
+     * @param ownerId ID del propietario a añadir.
+     */
     public void addOwnerId(String ownerId) {
         this.ownerIds.add(ownerId);
     }
 
+    /**
+     * Elimina un ID de propietario de la tarea.
+     *
+     * @param ownerId ID del propietario a eliminar.
+     */
     public void removeOwnerId(String ownerId) {
         this.ownerIds.remove(ownerId);
-
     }
 
     @Override
