@@ -25,6 +25,7 @@ public class SecurityConfig {
                         .requestMatchers("/tasks", "/tasks/**").permitAll()
                         .requestMatchers("/auth").permitAll()
                         .requestMatchers("/users").permitAll()
+                        .requestMatchers("/users/**").permitAll()
                         .anyRequest().authenticated()
                 )
                 .httpBasic();

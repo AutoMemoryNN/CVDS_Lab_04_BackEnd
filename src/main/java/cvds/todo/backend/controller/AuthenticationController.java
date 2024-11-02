@@ -1,5 +1,7 @@
 package cvds.todo.backend.controller;
 
+import cvds.todo.backend.exceptions.AppException;
+import cvds.todo.backend.exceptions.SessionException;
 import cvds.todo.backend.exceptions.UserException;
 import cvds.todo.backend.model.LoginModel;
 import cvds.todo.backend.model.PublicUserModel;
@@ -28,8 +30,8 @@ public class AuthenticationController {
             UserModel user = userService.loginUser(login.getUsername(), login.getPassword());
             return ResponseEntity.ok().body(Collections.singletonMap("cookie", this.sessionService.createSessionCookie(user)));
         } catch (Exception e) {
-            if (e instanceof UserException) {
-                return ((UserException) e).getResponse();
+            if (e instanceof AppException) {
+                return ((AppException) e).getResponse();
             }
             return ResponseEntity.status(500).body(Collections.singletonMap("error", "Server error"));
         }
@@ -41,6 +43,9 @@ public class AuthenticationController {
             sessionService.isSessionActive(token);
             return ResponseEntity.ok().body(new PublicUserModel(sessionService.getUserFromSession(token)));
         } catch (Exception e) {
+            if (e instanceof AppException) {
+                return ((AppException) e).getResponse();
+            }
             return ResponseEntity.status(500).body(Collections.singletonMap("error", "Server error"));
         }
     }
@@ -51,6 +56,9 @@ public class AuthenticationController {
             this.sessionService.invalidateSession(token);
             return ResponseEntity.ok().body(Collections.singletonMap("message", "User logged out"));
         } catch (Exception e) {
+            if (e instanceof AppException) {
+                return ((AppException) e).getResponse();
+            }
             return ResponseEntity.status(500).body(Collections.singletonMap("error", "Server error"));
         }
     }
