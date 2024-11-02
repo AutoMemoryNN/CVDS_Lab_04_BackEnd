@@ -9,7 +9,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collections;
-import java.util.Set;
 
 @RestController
 @RequestMapping("/users")
@@ -35,7 +34,7 @@ public class UserController {
     }
 
     @PostMapping("/admin")
-    public ResponseEntity<?> createUserAsAdmin(@RequestHeader("Authorizacion") String token, @RequestBody UserModel user, @RequestBody String roles) {
+    public ResponseEntity<?> createUserAsAdmin(@RequestHeader("authorization") String token, @RequestBody UserModel user, @RequestBody String roles) {
         try {
             final UserModel modelUser = userService.createUserAsAdmin(user, roles);
             this.authorizationService.adminResource(token);
@@ -49,7 +48,8 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getUserById(@RequestHeader("Authorizacion") String token, @PathVariable String id) {
+    public ResponseEntity<?> getUserById(@RequestHeader("authorization") String token, @PathVariable String id) {
+        System.out.println("!!!!!!!!!");
         try {
             this.authorizationService.adminResource(token);
             return ResponseEntity.ok(userService.getUserById(id));
@@ -63,7 +63,7 @@ public class UserController {
     }
 
     @GetMapping
-    public ResponseEntity<?> getAllUsers(@RequestHeader("Authorizacion") String token) {
+    public ResponseEntity<?> getAllUsers(@RequestHeader("authorization") String token) {
         try {
             this.authorizationService.adminResource(token);
             return ResponseEntity.ok(userService.getAllUsers());
@@ -76,7 +76,7 @@ public class UserController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateUser(@RequestHeader("Authorizacion") String token, @PathVariable String id, @RequestBody UserModel user) {
+    public ResponseEntity<?> updateUser(@RequestHeader("authorization") String token, @PathVariable String id, @RequestBody UserModel user) {
         try {
             this.authorizationService.adminResource(token);
             return ResponseEntity.ok(userService.updateUser(id, user));
@@ -89,7 +89,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteUser(@RequestHeader("Authorizacion") String token, @PathVariable String id) {
+    public ResponseEntity<?> deleteUser(@RequestHeader("authorization") String token, @PathVariable String id) {
         try {
             userService.deleteUser(id);
             this.authorizationService.adminResource(token);

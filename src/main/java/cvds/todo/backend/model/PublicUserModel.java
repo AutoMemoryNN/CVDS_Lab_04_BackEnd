@@ -2,20 +2,18 @@ package cvds.todo.backend.model;
 
 import org.springframework.data.annotation.Id;
 
-import java.util.HashSet;
-import java.util.Set;
-
 public class PublicUserModel {
     @Id
     private String id;
     private String username;
     private String email;
-    private Set<String> roles = new HashSet<String>();
+    private String role;
 
     public PublicUserModel(UserModel user) {
         username = user.getUsername();
         email = user.getEmail();
         id = user.getId();
+        role = user.getRole();
     }
 
     public String getId() {
@@ -42,11 +40,11 @@ public class PublicUserModel {
         this.email = email;
     }
 
-    public Set<String> getRoles() {
-        return roles;
+    public String getRole() {
+        return role;
     }
 
-    public void setRoles(Set<String> roles) {
-        this.roles = roles;
+    public void setRole(String role) {
+        this.role = role;
     }
 }

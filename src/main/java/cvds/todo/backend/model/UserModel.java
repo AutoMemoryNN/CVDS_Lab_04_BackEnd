@@ -3,10 +3,6 @@ package cvds.todo.backend.model;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
 @Document(collection = "users")
 public class UserModel {
     @Id
@@ -14,7 +10,7 @@ public class UserModel {
     private String username;
     private String email;
     private String password;
-    private String roles;
+    private String role;
 
     public UserModel() {
     }
@@ -51,11 +47,11 @@ public class UserModel {
         this.email = email;
     }
 
-    public String getRoles() {
-        return roles;
+    public String getRole() {
+        return role;
     }
 
-    public void setRoles(String roles) {
-        this.roles = roles;
+    public void setRole(String role) {
+        this.role = role;
     }
 }

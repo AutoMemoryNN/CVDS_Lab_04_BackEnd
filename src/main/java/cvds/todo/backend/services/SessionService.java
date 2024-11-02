@@ -18,6 +18,12 @@ public class SessionService implements SessionsService {
     public UserModel getUserFromSession(String sessionId) throws SessionException {
         SessionInfo sessionInfo = activeSessions.get(sessionId);
 
+        System.out.println(sessionInfo);
+
+        activeSessions.forEach((key, value) -> {
+            System.out.println(key + ": : :" + value);
+        });
+
         if (sessionInfo == null) {
             throw new SessionException.SessionNotFoundException(sessionId);
         }
@@ -83,6 +89,11 @@ public class SessionService implements SessionsService {
         SessionInfo(UserModel user, long expirationTime) {
             this.user = user;
             this.expirationTime = expirationTime;
+        }
+
+        @Override
+        public String toString() {
+            return user.getUsername() + ": " + expirationTime;
         }
     }
 }

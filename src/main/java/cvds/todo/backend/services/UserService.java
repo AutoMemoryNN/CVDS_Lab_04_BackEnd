@@ -28,13 +28,13 @@ public class UserService implements UsersService {
     }
 
     public UserModel createUserAsUser(UserModel user) throws UserException {
-        user.setRoles(Role.ROLE_ADMIN.name());
+        user.setRole(Role.ROLE_ADMIN.name());
         return this.createUser(user);
     }
 
     public UserModel createUserAsAdmin(UserModel user, String roles) throws UserException {
-        this.validateRole(user.getRoles());
-        user.setRoles(roles);
+        this.validateRole(user.getRole());
+        user.setRole(roles);
 
         return this.createUser(user);
     }
@@ -53,7 +53,7 @@ public class UserService implements UsersService {
                 userToUpdate.setPassword(passwordEncoder.encode(user.getPassword()));
             }
 
-            userToUpdate.setRoles(user.getRoles() == null || user.getRoles().isEmpty() ? userToUpdate.getRoles() : user.getRoles());
+            userToUpdate.setRole(user.getRole() == null || user.getRole().isEmpty() ? userToUpdate.getRole() : user.getRole());
 
             userRepository.save(userToUpdate);
             return userToUpdate;
@@ -111,11 +111,11 @@ public class UserService implements UsersService {
         validateEmail(user.getEmail());
         validatePassword(user.getPassword());
 
-        if (user.getRoles() == null || user.getRoles().isEmpty()) {
+        if (user.getRole() == null || user.getRole().isEmpty()) {
             throw new UserException.UserInvalidValueException("All users must have a role");
         }
 
-        this.validateRole(user.getRoles());
+        this.validateRole(user.getRole());
     }
 
     private void validateUsername(String username) throws UserException.UserInvalidValueException {
